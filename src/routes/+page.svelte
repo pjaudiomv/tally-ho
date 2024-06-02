@@ -1,5 +1,5 @@
 <script>
-	import DataConverter from '$lib/YapTally.svelte';
+	import YapTally from '$lib/YapTally.svelte';
 	import '../css/main.scss';
 </script>
 
@@ -9,7 +9,7 @@
 	<meta name="mobile-web-app-capable" content="yes" />
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<link rel="icon" href="favicon.png" />
-	<title>BMLT Data Converter</title>
+	<title>Yap Tally</title>
 </svelte:head>
 
-<DataConverter />
+<YapTally />
