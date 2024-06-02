@@ -1,9 +1,6 @@
-# BMLT Data Converter
+# Yap Tally
 
-- Converts BMLT data from JSON to CSV, XLSX, XML KML, or YAML
-  - Note that export of KML is only supported with GetSearchResults.
-- Use your semantic interface to build query url. You can find your semantic url by visiting the
-  [tally](https://tally.bmlt.app/) and hitting Explore on your root server.
+- To submit new Yap servers submit Pull Request or create new Issue [here](https://github.com/bmlt-enabled/yap-tally/issues).
 
 ---
 
