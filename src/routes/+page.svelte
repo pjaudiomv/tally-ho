@@ -1,5 +1,5 @@
 <script>
-	import DataConverter from '$lib/DataConverter.svelte';
+	import DataConverter from '$lib/YapTally.svelte';
 	import '../css/main.scss';
 </script>
 
