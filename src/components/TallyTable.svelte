@@ -2,7 +2,7 @@
 	import { afterUpdate } from 'svelte';
 	import { tallyData } from '$lib/store';
 	import { TableSort } from '$lib/TableSort';
-	import type { Tally, Meeting } from '$lib/types';
+	import type { Tally, Root } from '$lib/types';
 
 	let tally: Tally;
 
@@ -14,15 +14,15 @@
 		return url.startsWith('https') ? 'Y' : 'N';
 	};
 
-	const semanticAdminEnabled = (root: Meeting): string => {
+	const semanticAdminEnabled = (root: Root): string => {
 		return JSON.parse(root.server_info).semanticAdmin === '1' ? 'Y' : 'N';
 	};
 
-	const googleApiKeyPresent = (root: Meeting): string => {
+	const googleApiKeyPresent = (root: Root): string => {
 		return JSON.parse(root.server_info).google_api_key ? 'Y' : 'N';
 	};
 
-	const serverInfo = (root: Meeting, key: string): string => {
+	const serverInfo = (root: Root, key: string): string => {
 		return JSON.parse(root.server_info)[key];
 	};
 
@@ -55,18 +55,18 @@
 			</tr>
 		</thead>
 		<tbody id="tallyBody">
-			{#each tally.meetings as meeting}
+			{#each tally.filteredRoots as root}
 				<tr>
-					<td class="tallyName"><a href={meeting.root_server_url} target="_blank">{meeting.name}</a> [<a href="{meeting.root_server_url}/semantic" target="_blank">Explore</a>]</td>
-					<td>{tlsEnabled(meeting.root_server_url)}</td>
-					<td>{semanticAdminEnabled(meeting)}</td>
-					<td>{googleApiKeyPresent(meeting)}</td>
-					<td>{serverInfo(meeting, 'version')}</td>
-					<td>{meeting.num_zones}</td>
-					<td>{meeting.num_regions}</td>
-					<td>{meeting.num_areas}</td>
-					<td>{meeting.num_groups}</td>
-					<td>{meeting.num_total_meetings}</td>
+					<td class="tallyName"><a href={root.root_server_url} target="_blank">{root.name}</a> [<a href="{root.root_server_url}/semantic" target="_blank">Explore</a>]</td>
+					<td>{tlsEnabled(root.root_server_url)}</td>
+					<td>{semanticAdminEnabled(root)}</td>
+					<td>{googleApiKeyPresent(root)}</td>
+					<td>{serverInfo(root, 'version')}</td>
+					<td>{root.num_zones}</td>
+					<td>{root.num_regions}</td>
+					<td>{root.num_areas}</td>
+					<td>{root.num_groups}</td>
+					<td>{root.num_total_meetings}</td>
 				</tr>
 			{/each}
 		</tbody>

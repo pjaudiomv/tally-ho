@@ -10,7 +10,7 @@ export const initialTally: Tally = {
 	zonesCount: 0,
 	serversCount: 0,
 	serviceBodiesCount: 0,
-	meetings: [],
+	filteredRoots: [],
 	roots: [],
 	reports: {
 		byRootServerVersions: {
@@ -20,3 +20,4 @@ export const initialTally: Tally = {
 };
 
 export const tallyData = writable<Tally>(initialTally);
+export const currentView = writable('default');

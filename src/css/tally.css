@@ -248,6 +248,14 @@ div#tallyVersion {
 	text-align: left;
 }
 
+#tallyRootServerVersionTable td {
+	text-align: left;
+}
+
+#meetingVenueReport td {
+	text-align: left;
+}
+
 .link-like {
 	color: #0a61ad;
 	text-decoration: none;

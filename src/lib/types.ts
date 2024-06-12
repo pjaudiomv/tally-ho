@@ -28,7 +28,24 @@ export interface ServerInfo {
 	aggregator_mode_enabled: boolean;
 }
 
+export interface ServiceBody {
+	id: string;
+	parent_id: string;
+	name: string;
+	description: string;
+	type: string;
+	url: string;
+	helpline: string;
+	world_id: string;
+	contact_email: string;
+}
+
 export interface Meeting {
+	id_bigint: string;
+	meeting_name: string;
+}
+
+export interface Root {
 	root_server_url: string;
 	name: string;
 	num_zones: number;
@@ -41,9 +58,10 @@ export interface Meeting {
 	num_hybrid: number;
 	num_unknown: number;
 	server_info: string;
+	id?: string;
 }
 
-export interface Root {
+export interface AggregatorRoot {
 	id: number;
 	sourceId: number;
 	name: string;
@@ -83,7 +101,7 @@ export interface Tally {
 	zonesCount: number;
 	serversCount: number;
 	serviceBodiesCount: number;
-	meetings: Meeting[];
-	roots: Root[];
+	filteredRoots: Root[];
+	roots: AggregatorRoot[];
 	reports: Reports;
 }
