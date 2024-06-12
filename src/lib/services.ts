@@ -13,7 +13,7 @@ export async function fetchTallyData() {
 	try {
 		const data: AggregatorRoot[] = await getJSON(`${aggregatorUrl}/api/v1/rootservers/`);
 		const newState = await calculateTallyData(data);
-		// const meetingData = await fetchMeetingsData(newState );
+		const meetingData = await fetchMeetingsData(newState );
 		tallyData.update((state) => {
 			return { ...state, ...newState };
 		});
@@ -24,14 +24,14 @@ export async function fetchTallyData() {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const fetchMeetingsData = async (tallyData: Tally) => {
-	const shardSize = 1000;
+	const shardSize = 500;
 	const shards = Math.ceil(tallyData.meetingsCount / shardSize);
 	const pages = Array.from({ length: shards }, (_, i) => i + 1);
 
 	const pageNums = pages.splice(0, pages.length >= shardSize ? shardSize : pages.length);
 	const meetingsPromises = pageNums.map(async (page) => {
-		const response = await fetchJsonp(`${aggregatorUrl}/client_interface/jsonp/?switcher=GetSearchResults&data_field_key=longitude,latitude&page_num=${page}&page_size=${shardSize}`);
-		return response.json();
+		const response = await getJSON(`${aggregatorUrl}/client_interface/json/?switcher=GetSearchResults&data_field_key=longitude,latitude&page_num=${page}&page_size=${shardSize}`);
+		return response;
 	});
 
 	return Promise.all(meetingsPromises);
