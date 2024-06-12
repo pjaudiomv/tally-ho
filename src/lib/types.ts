@@ -43,6 +43,8 @@ export interface ServiceBody {
 export interface Meeting {
 	id_bigint: string;
 	meeting_name: string;
+	longitude: string;
+	latitude: string;
 }
 
 export interface Root {

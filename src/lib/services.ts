@@ -1,4 +1,3 @@
-import fetchJsonp from 'fetch-jsonp';
 import { tallyData, currentView, isLoadingData } from './store';
 import TallyReports from '../components/TallyReports.svelte';
 import TallyMap from '../components/TallyMap.svelte';
@@ -13,24 +12,25 @@ export async function fetchTallyData() {
 	try {
 		const data: AggregatorRoot[] = await getJSON(`${aggregatorUrl}/api/v1/rootservers/`);
 		const newState = await calculateTallyData(data);
-		const meetingData = await fetchMeetingsData(newState );
 		tallyData.update((state) => {
 			return { ...state, ...newState };
 		});
+		const meetingData = await fetchMeetingsData(4, newState);
+		console.log(meetingData);
+		isLoadingData.set(false);
 	} catch (error) {
 		console.error('Error fetching tally data:', error);
 	}
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const fetchMeetingsData = async (tallyData: Tally) => {
-	const shardSize = 500;
-	const shards = Math.ceil(tallyData.meetingsCount / shardSize);
+const fetchMeetingsData = async (n: number, tallyData: Partial<Tally>) => {
+	const shardSize = 1000;
+	const shards = Math.ceil(tallyData.meetingsCount ?? 35000 / shardSize);
 	const pages = Array.from({ length: shards }, (_, i) => i + 1);
 
-	const pageNums = pages.splice(0, pages.length >= shardSize ? shardSize : pages.length);
+	const pageNums = pages.splice(0, pages.length >= n ? n : pages.length);
 	const meetingsPromises = pageNums.map(async (page) => {
-		const response = await getJSON(`${aggregatorUrl}/client_interface/json/?switcher=GetSearchResults&data_field_key=longitude,latitude&page_num=${page}&page_size=${shardSize}`);
+		const response: Meeting[] = await getJSON(`${aggregatorUrl}/client_interface/json/?switcher=GetSearchResults&data_field_key=longitude,latitude&page_num=${page}&page_size=${shardSize}`);
 		return response;
 	});
 
@@ -174,7 +174,6 @@ async function calculateTallyData(roots: AggregatorRoot[]): Promise<Partial<Tall
 
 	const virtualRoots = await getVirtualRootsDetails(VirtualRoots);
 	filteredRoots.push(...virtualRoots);
-	isLoadingData.set(false);
 	return {
 		meetingsCount,
 		groupsCount,
