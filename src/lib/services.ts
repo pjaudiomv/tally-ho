@@ -1,4 +1,4 @@
-import { tallyData, currentView } from './store';
+import { tallyData, currentView, isLoadingData } from './store';
 import TallyReports from '../components/TallyReports.svelte';
 import TallyMap from '../components/TallyMap.svelte';
 import { VirtualRoots } from '$lib/VirtualRoots';
@@ -41,17 +41,21 @@ export function displayTallyTable() {
 	currentView.set('default'); // Use store to manage current view
 	const tallyMan = document.getElementById('tallyMan');
 	const tallyReports = document.getElementById('tallyReports');
+	const tallyMapDiv = document.getElementById('tallyMapDiv');
 
 	if (tallyMan && tallyReports) {
 		tallyMan.style.display = 'block';
 		tallyReports.style.display = 'none';
+	}
+	if (tallyMapDiv) {
+		tallyMapDiv.style.display = 'none';
 	}
 }
 
 export function displayTallyMap() {
 	currentView.set('map'); // Use store to manage current view
 	const tallyMan = document.getElementById('tallyMan');
-	const tallyMap = document.getElementById('tallyMap');
+	const tallyMap = document.getElementById('tallyMapDiv');
 
 	if (tallyMan && tallyMap) {
 		tallyMan.style.display = 'none';
@@ -152,7 +156,7 @@ async function calculateTallyData(roots: AggregatorRoot[]): Promise<Partial<Tall
 
 	const virtualRoots = await getVirtualRootsDetails(VirtualRoots);
 	filteredRoots.push(...virtualRoots);
-
+	isLoadingData.set(false);
 	return {
 		meetingsCount,
 		groupsCount,

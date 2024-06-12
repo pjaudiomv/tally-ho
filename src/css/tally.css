@@ -23,7 +23,6 @@ img#tallyBannerImage {
 	width: auto;
 }
 
-/* Portrait */
 @media only screen and (min-device-width: 320px) and (max-device-width: 480px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: portrait) {
 	#tallyBannerContainer {
 		background-size: 12% 100%;
@@ -153,6 +152,10 @@ table#tallyLogTable {
 	font-style: italic;
 }
 
+#tallyRootServerDataLoading {
+	margin-bottom: 1em;
+}
+
 table#tallyLogTable td.in-progress-0 {
 	color: #c30;
 }
@@ -221,9 +224,14 @@ div#tallyButtonLoading {
 	margin-bottom: 1em;
 }
 
-div#tallyMap {
+div#tallyMapDiv {
 	width: 100%;
 	height: 85%;
+}
+
+div#map {
+	width: 100%;
+	height: 100%;
 }
 
 div.centerControlDiv {

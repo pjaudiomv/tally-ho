@@ -18,9 +18,6 @@
 <div id="tallyMan">
 	<TallySummary />
 	<TallyButtons />
-	<div id="tallyLogTable" style="display:none">
-		<div id="tallyRootServerDataLoading"><img src="images/spinner3.gif" alt="Loading" /> Loading Root Server Data</div>
-	</div>
 	<TallyTable />
 	<TallyLegend />
 </div>
@@ -28,4 +25,6 @@
 	<TallyButtons />
 	<div id="tallyReportsTemplate"></div>
 </div>
-<div id="tallyMap" style="display: none;"></div>
+<div id="tallyMapDiv" style="display: none;">
+	<div id="map"></div>
+</div>

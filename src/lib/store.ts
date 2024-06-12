@@ -21,3 +21,4 @@ export const initialTally: Tally = {
 
 export const tallyData = writable<Tally>(initialTally);
 export const currentView = writable('default');
+export const isLoadingData = writable(true);
