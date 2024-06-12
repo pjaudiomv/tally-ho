@@ -1,6 +1,5 @@
 <script>
-	import YapTally from '$lib/YapTally.svelte';
-	import '../css/main.scss';
+	import BmltTally from '$lib/App.svelte';
 </script>
 
 <svelte:head>
@@ -9,7 +8,7 @@
 	<meta name="mobile-web-app-capable" content="yes" />
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<link rel="icon" href="favicon.png" />
-	<title>Yap Tally</title>
+	<title>BMLT Tally</title>
 </svelte:head>
 
-<YapTally />
+<BmltTally />

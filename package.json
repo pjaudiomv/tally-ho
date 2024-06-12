@@ -10,7 +10,8 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
-		"deploy": "npm run build && touch ./build/.nojekyll && echo 'app.patrickjoyce.dev' > ./build/CNAME && npx gh-pages -d build -t true"
+		"deploy": "npm run build && touch ./build/.nojekyll && echo 'app.patrickjoyce.dev' > ./build/CNAME && npx gh-pages -d build -t true",
+		"validate": "prettier --write . && prettier --check . && eslint . && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.0.0",
@@ -19,24 +20,18 @@
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"@types/eslint": "8.56.10",
 		"@types/js-yaml": "^4.0.9",
-		"@typescript-eslint/eslint-plugin": "^7.0.0",
-		"@typescript-eslint/parser": "^7.0.0",
-		"eslint": "^8.56.0",
+		"typescript-eslint": "^8.0.0-alpha.20",
+		"eslint": "^9.0.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.35.1",
-		"fetch-jsonp": "^1.3.0",
 		"gh-pages": "^6.1.1",
-		"js-yaml": "^4.1.0",
-		"js2xmlparser": "^5.0.0",
 		"prettier": "^3.1.1",
 		"prettier-plugin-svelte": "^3.1.2",
-		"sass": "^1.71.0",
 		"svelte": "^4.2.7",
 		"svelte-check": "^3.6.0",
 		"tslib": "^2.4.1",
 		"typescript": "^5.0.0",
-		"vite": "^5.0.3",
-		"xlsx": "https://cdn.sheetjs.com/xlsx-0.20.2/xlsx-0.20.2.tgz"
+		"vite": "^5.0.3"
 	},
 	"type": "module"
 }
