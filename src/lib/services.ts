@@ -1,3 +1,4 @@
+import fetchJsonp from 'fetch-jsonp';
 import { tallyData, currentView, isLoadingData } from './store';
 import TallyReports from '../components/TallyReports.svelte';
 import TallyMap from '../components/TallyMap.svelte';
@@ -6,11 +7,13 @@ import type { Tally, AggregatorRoot, Root, Reports, ServerInfo, ServiceBody, Mee
 
 let tallyReportsInstance: TallyReports | null = null;
 let tallyMapInstance: TallyMap | null = null;
+const aggregatorUrl: string = 'https://aggregator.bmltenabled.org/main_server';
 
 export async function fetchTallyData() {
 	try {
-		const data: AggregatorRoot[] = await getJSON('https://aggregator.bmltenabled.org/main_server/api/v1/rootservers/');
+		const data: AggregatorRoot[] = await getJSON(`${aggregatorUrl}/api/v1/rootservers/`);
 		const newState = await calculateTallyData(data);
+		// const meetingData = await fetchMeetingsData(newState );
 		tallyData.update((state) => {
 			return { ...state, ...newState };
 		});
@@ -18,6 +21,21 @@ export async function fetchTallyData() {
 		console.error('Error fetching tally data:', error);
 	}
 }
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const fetchMeetingsData = async (tallyData: Tally) => {
+	const shardSize = 1000;
+	const shards = Math.ceil(tallyData.meetingsCount / shardSize);
+	const pages = Array.from({ length: shards }, (_, i) => i + 1);
+
+	const pageNums = pages.splice(0, pages.length >= shardSize ? shardSize : pages.length);
+	const meetingsPromises = pageNums.map(async (page) => {
+		const response = await fetchJsonp(`${aggregatorUrl}/client_interface/jsonp/?switcher=GetSearchResults&data_field_key=longitude,latitude&page_num=${page}&page_size=${shardSize}`);
+		return response.json();
+	});
+
+	return Promise.all(meetingsPromises);
+};
 
 export function displayTallyReports() {
 	currentView.set('reports'); // Use store to manage current view
