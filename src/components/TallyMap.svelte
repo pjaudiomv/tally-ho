@@ -19,10 +19,10 @@
 	let mapElement: HTMLElement;
 	let mapMarkers: google.maps.Marker[] = [];
 
-	function showTable() {
+	const showTable = () => {
 		displayTallyTable();
 		currentView.set('default');
-	}
+	};
 
 	const setUpMapControls = (map: google.maps.Map) => {
 		const centerControlDiv = document.createElement('div');
@@ -41,18 +41,12 @@
 
 	const initMap = async (map: google.maps.Map) => {
 		setUpMapControls(map);
-		google.maps.event.addListener(map, 'zoom_changed', function () {
-			recalculateOverlaps();
-		});
-		google.maps.event.addListener(map, 'bounds_changed', function () {
-			displayMeetingMarkers();
-		});
-		google.maps.event.addListener(map, 'dragstart', function () {
+		google.maps.event.addListener(map, 'zoom_changed', () => recalculateOverlaps());
+		google.maps.event.addListener(map, 'bounds_changed', () => displayMeetingMarkers());
+		google.maps.event.addListener(map, 'dragstart', () => {
 			whatADrag = true;
 		});
-		google.maps.event.addListener(map, 'idle', function () {
-			handleIdle();
-		});
+		google.maps.event.addListener(map, 'idle', () => handleIdle());
 	};
 
 	const handleIdle = () => {
@@ -184,7 +178,7 @@
 		}
 	};
 
-	onMount(async function () {
+	onMount(async () => {
 		const thing = 'QUl6YVN5QzRkMWNqX2ZRbVR1SDVJbTZoSkJXelRVWjNxZ2wzQjZF';
 		const loader = new Loader({
 			apiKey: window.atob(thing),

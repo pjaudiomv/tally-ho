@@ -1,3 +1,4 @@
+//  http://tristen.ca/tablesort/demo/
 type CompareFn = (a: string, b: string) => number;
 
 const sortOptions: {

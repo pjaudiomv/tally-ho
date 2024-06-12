@@ -2,24 +2,24 @@
 	import { currentView, isLoadingData } from '$lib/store';
 	import { displayTallyReports, displayTallyTable, displayTallyMap } from '$lib/services';
 
-	function showTallyReports() {
+	const showTallyReports = () => {
 		displayTallyReports();
 		currentView.set('reports');
-	}
+	};
 
-	function showTable() {
+	const showTable = () => {
 		displayTallyTable();
 		currentView.set('default');
-	}
+	};
 
-	function showTallyMap() {
+	const showTallyMap = () => {
 		displayTallyMap();
 		currentView.set('map');
-	}
+	};
 
-	function openMetrics() {
+	const openMetrics = () => {
 		window.open('https://metrics.bmlt.app/', '_blank');
-	}
+	};
 </script>
 
 <div class="tallyButtons">

@@ -21,7 +21,7 @@
 		}
 	};
 
-	afterUpdate(async function () {
+	afterUpdate(async () => {
 		tableReportSort();
 	});
 </script>

@@ -9,22 +9,25 @@ let tallyMapInstance: TallyMap | null = null;
 const aggregatorUrl: string = 'https://aggregator.bmltenabled.org/main_server';
 const concurrentRequests = 4;
 
-export async function fetchTallyData() {
+export const fetchTallyData = async () => {
 	try {
 		const aggregatorRootData: AggregatorRoot[] = await getJSON(`${aggregatorUrl}/api/v1/rootservers/`);
 		const newState = await calculateTallyData(aggregatorRootData);
-		tallyData.update((state) => {
-			return { ...state, ...newState };
-		});
+
+		tallyData.update((state) => ({
+			...state,
+			...newState
+		}));
+
 		const aggregatorMeetingData = await fetchMeetingData(concurrentRequests, newState);
-		meetingData.update(() => {
-			return aggregatorMeetingData;
-		});
+
+		meetingData.update(() => aggregatorMeetingData);
+
 		isLoadingData.set(false);
 	} catch (error) {
 		console.error('Error fetching tally data:', error);
 	}
-}
+};
 
 const fetchMeetingData = async (concurrentRequests: number, tallyData: Partial<Tally>) => {
 	const shardSize = 1000;
@@ -53,7 +56,7 @@ const fetchMeetingData = async (concurrentRequests: number, tallyData: Partial<T
 	return results;
 };
 
-export function displayTallyReports() {
+export const displayTallyReports = () => {
 	currentView.set('reports'); // Use store to manage current view
 	const tallyMan = document.getElementById('tallyMan');
 	const tallyReports = document.getElementById('tallyReports');
@@ -69,9 +72,9 @@ export function displayTallyReports() {
 			});
 		}
 	}
-}
+};
 
-export function displayTallyTable() {
+export const displayTallyTable = () => {
 	currentView.set('default'); // Use store to manage current view
 	const tallyMan = document.getElementById('tallyMan');
 	const tallyReports = document.getElementById('tallyReports');
@@ -84,9 +87,9 @@ export function displayTallyTable() {
 	if (tallyMapDiv) {
 		tallyMapDiv.style.display = 'none';
 	}
-}
+};
 
-export function displayTallyMap() {
+export const displayTallyMap = () => {
 	currentView.set('map'); // Use store to manage current view
 	const tallyMan = document.getElementById('tallyMan');
 	const tallyMap = document.getElementById('tallyMapDiv');
@@ -101,7 +104,7 @@ export function displayTallyMap() {
 			});
 		}
 	}
-}
+};
 
 const getVirtualRootsDetails = async (roots: Root[]): Promise<Root[]> => {
 	const updatedRoots: Root[] = [];
@@ -151,7 +154,7 @@ const getVirtualRootsDetails = async (roots: Root[]): Promise<Root[]> => {
 	return updatedRoots;
 };
 
-async function calculateTallyData(roots: AggregatorRoot[]): Promise<Partial<Tally>> {
+const calculateTallyData = async (roots: AggregatorRoot[]): Promise<Partial<Tally>> => {
 	let meetingsCount = 0;
 	let groupsCount = 0;
 	let areasCount = 0;
@@ -202,12 +205,12 @@ async function calculateTallyData(roots: AggregatorRoot[]): Promise<Partial<Tall
 		serviceBodiesCount: areasCount + regionsCount + zonesCount,
 		reports: { byRootServerVersions }
 	};
-}
+};
 
-async function getJSON(url: string): Promise<[]> {
+const getJSON = async (url: string): Promise<[]> => {
 	const response = await fetch(url);
 	if (!response.ok) {
 		throw new Error('Network response was not ok');
 	}
 	return await response.json();
-}
+};

@@ -33,7 +33,7 @@
 		}
 	};
 
-	afterUpdate(async function () {
+	afterUpdate(async () => {
 		tableRender();
 	});
 </script>
