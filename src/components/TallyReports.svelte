@@ -29,7 +29,7 @@
 <table id="tallyRootServerVersionTable" class="tallyTable">
 	<thead id="tallyHead">
 		<tr>
-			<th data-sort-default class="selected"><span class="link-like">Version</span></th>
+			<th data-sort-default data-sort-method="dotsep" class="selected"><span class="link-like">Version</span></th>
 			<th><span class="link-like">Count</span></th>
 		</tr>
 	</thead>
