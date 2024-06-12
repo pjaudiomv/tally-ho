@@ -29,7 +29,7 @@
 	const tableRender = () => {
 		const tableElement = document.getElementById('tallyHo') as HTMLTableElement;
 		if (tableElement) {
-			new TableSort(tableElement, { descending: true });
+			new TableSort(tableElement, { descending: false });
 		}
 	};
 
