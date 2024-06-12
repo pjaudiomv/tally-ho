@@ -24,8 +24,8 @@
 	<TallyTable />
 	<TallyLegend />
 </div>
-<div id="tallyMap" style="display: none;"></div>
 <div id="tallyReports" style="display: none;">
 	<TallyButtons />
 	<div id="tallyReportsTemplate"></div>
 </div>
+<div id="tallyMap" style="display: none;"></div>

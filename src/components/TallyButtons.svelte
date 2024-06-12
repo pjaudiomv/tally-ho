@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { currentView } from '$lib/store';
-	import { displayTallyReports, displayTallyTable } from '$lib/services';
+	import { displayTallyReports, displayTallyTable, displayTallyMap } from '$lib/services';
 
 	function showTallyReports() {
 		displayTallyReports();
@@ -12,6 +12,11 @@
 		currentView.set('default');
 	}
 
+	function showTallyMap() {
+		displayTallyMap();
+		currentView.set('map');
+	}
+
 	function openMetrics() {
 		window.open('https://metrics.bmlt.app/', '_blank');
 	}
@@ -19,10 +24,15 @@
 
 <div class="tallyButtons">
 	{#if $currentView === 'default'}
+		<!--		<div id="tallyButtonLoading"><img src="images/spinner3.gif"> Loading Meeting Details for Map</div>-->
+		<input class="tallyButton" id="tallyMapButton" type="button" value="Display Map" on:click={showTallyMap} />
 		<input class="tallyButton" id="tallyReportsButton" type="button" value="Reports" on:click={showTallyReports} />
 		<input class="tallyButton" id="tallyMetrics" type="button" value="Metrics" on:click={openMetrics} />
 	{/if}
 	{#if $currentView === 'reports'}
+		<input class="tallyButton" id="tallyRootServers" type="button" value="Root Servers" on:click={showTable} />
+	{/if}
+	{#if $currentView === 'map'}
 		<input class="tallyButton" id="tallyRootServers" type="button" value="Root Servers" on:click={showTable} />
 	{/if}
 </div>

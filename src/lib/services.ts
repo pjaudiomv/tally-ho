@@ -1,26 +1,11 @@
 import { tallyData, currentView } from './store';
 import TallyReports from '../components/TallyReports.svelte';
+import TallyMap from '../components/TallyMap.svelte';
+import { VirtualRoots } from '$lib/VirtualRoots';
 import type { Tally, AggregatorRoot, Root, Reports, ServerInfo, ServiceBody, Meeting } from '$lib/types';
 
 let tallyReportsInstance: TallyReports | null = null;
-
-const virtual_roots: Root[] = [
-	{
-		id: '143',
-		name: 'Virtual NA',
-		root_server_url: 'https://bmlt.virtual-na.org/main_server/',
-		num_zones: 0,
-		num_regions: 0,
-		num_areas: 0,
-		num_groups: 0,
-		num_total_meetings: 0,
-		num_in_person: 0,
-		num_virtual: 0,
-		num_hybrid: 0,
-		num_unknown: 0,
-		server_info: '[{"version": "0.0.0","semanticAdmin": "0"}]'
-	}
-];
+let tallyMapInstance: TallyMap | null = null;
 
 export async function fetchTallyData() {
 	try {
@@ -60,6 +45,23 @@ export function displayTallyTable() {
 	if (tallyMan && tallyReports) {
 		tallyMan.style.display = 'block';
 		tallyReports.style.display = 'none';
+	}
+}
+
+export function displayTallyMap() {
+	currentView.set('map'); // Use store to manage current view
+	const tallyMan = document.getElementById('tallyMan');
+	const tallyMap = document.getElementById('tallyMap');
+
+	if (tallyMan && tallyMap) {
+		tallyMan.style.display = 'none';
+		tallyMap.style.display = 'block';
+
+		if (!tallyMapInstance) {
+			tallyMapInstance = new TallyMap({
+				target: tallyMap
+			});
+		}
 	}
 }
 
@@ -148,7 +150,7 @@ async function calculateTallyData(roots: AggregatorRoot[]): Promise<Partial<Tall
 		});
 	});
 
-	const virtualRoots = await getVirtualRootsDetails(virtual_roots);
+	const virtualRoots = await getVirtualRootsDetails(VirtualRoots);
 	filteredRoots.push(...virtualRoots);
 
 	return {
