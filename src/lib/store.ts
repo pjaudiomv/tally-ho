@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import type { Tally } from './types'; // Adjust the import path as necessary
+import type { Tally, MeetingLocations } from './types'; // Adjust the import path as necessary
 
 export const initialTally: Tally = {
 	knownTotal: 72215,
@@ -19,6 +19,8 @@ export const initialTally: Tally = {
 	}
 };
 
+export const initialMeetingData: MeetingLocations[] = [];
 export const tallyData = writable<Tally>(initialTally);
+export const meetingData = writable<MeetingLocations[]>(initialMeetingData);
 export const currentView = writable('default');
 export const isLoadingData = writable(true);

@@ -1,40 +1,56 @@
-import { tallyData, currentView, isLoadingData } from './store';
+import { tallyData, meetingData, currentView, isLoadingData } from './store';
 import TallyReports from '../components/TallyReports.svelte';
 import TallyMap from '../components/TallyMap.svelte';
 import { VirtualRoots } from '$lib/VirtualRoots';
-import type { Tally, AggregatorRoot, Root, Reports, ServerInfo, ServiceBody, Meeting } from '$lib/types';
+import type { Tally, AggregatorRoot, Root, Reports, ServerInfo, ServiceBody, Meeting, MeetingLocations } from '$lib/types';
 
 let tallyReportsInstance: TallyReports | null = null;
 let tallyMapInstance: TallyMap | null = null;
 const aggregatorUrl: string = 'https://aggregator.bmltenabled.org/main_server';
+const concurrentRequests = 4;
 
 export async function fetchTallyData() {
 	try {
-		const data: AggregatorRoot[] = await getJSON(`${aggregatorUrl}/api/v1/rootservers/`);
-		const newState = await calculateTallyData(data);
+		const aggregatorRootData: AggregatorRoot[] = await getJSON(`${aggregatorUrl}/api/v1/rootservers/`);
+		const newState = await calculateTallyData(aggregatorRootData);
 		tallyData.update((state) => {
 			return { ...state, ...newState };
 		});
-		const meetingData = await fetchMeetingsData(4, newState);
-		console.log(meetingData);
+		const aggregatorMeetingData = await fetchMeetingData(concurrentRequests, newState);
+		meetingData.update(() => {
+			return aggregatorMeetingData;
+		});
 		isLoadingData.set(false);
 	} catch (error) {
 		console.error('Error fetching tally data:', error);
 	}
 }
 
-const fetchMeetingsData = async (n: number, tallyData: Partial<Tally>) => {
+const fetchMeetingData = async (concurrentRequests: number, tallyData: Partial<Tally>) => {
 	const shardSize = 1000;
-	const shards = Math.ceil(tallyData.meetingsCount ?? 35000 / shardSize);
+	const shards = Math.ceil((tallyData.meetingsCount ?? 35000) / shardSize);
+	const results: MeetingLocations[] = [];
 	const pages = Array.from({ length: shards }, (_, i) => i + 1);
 
-	const pageNums = pages.splice(0, pages.length >= n ? n : pages.length);
-	const meetingsPromises = pageNums.map(async (page) => {
-		const response: Meeting[] = await getJSON(`${aggregatorUrl}/client_interface/json/?switcher=GetSearchResults&data_field_key=longitude,latitude&page_num=${page}&page_size=${shardSize}`);
-		return response;
-	});
+	const fetchPage = async (page: number) => {
+		const response: { longitude: string; latitude: string }[] = await getJSON(
+			`${aggregatorUrl}/client_interface/json/?switcher=GetSearchResults&data_field_key=longitude,latitude&page_num=${page}&page_size=${shardSize}`
+		);
+		const convertedResponse = response.map((location) => ({
+			longitude: parseFloat(location.longitude),
+			latitude: parseFloat(location.latitude)
+		}));
+		results.push(...convertedResponse);
+	};
 
-	return Promise.all(meetingsPromises);
+	const fetchInBatches = async (pages: number[]) => {
+		while (pages.length) {
+			await Promise.all(pages.splice(0, concurrentRequests).map(fetchPage));
+		}
+	};
+
+	await fetchInBatches(pages);
+	return results;
 };
 
 export function displayTallyReports() {

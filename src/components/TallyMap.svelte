@@ -1,8 +1,16 @@
 <script lang="ts">
 	import { displayTallyTable } from '$lib/services';
-	import { currentView } from '$lib/store';
+	import { currentView, meetingData } from '$lib/store';
+	import type { MeetingLocations } from '$lib/types';
 	import { onMount } from 'svelte';
 	import { Loader } from '@googlemaps/js-api-loader';
+	import { MarkerClusterer, Cluster } from '@googlemaps/markerclusterer';
+
+	let meetings: MeetingLocations[] = [];
+
+	meetingData.subscribe((value) => {
+		meetings = value;
+	});
 
 	let map: google.maps.Map;
 	let mapElement: HTMLElement;
@@ -31,6 +39,26 @@
 		setUpMapControls(map);
 	};
 
+	const createCustomRenderer = () => {
+		return {
+			render(cluster: Cluster): google.maps.marker.AdvancedMarkerElement {
+				const count = cluster.count;
+				const position = cluster.position;
+
+				const naMarkerImage = document.createElement('img');
+				naMarkerImage.src = count > 10 ? 'images/NAMarkerB.png' : 'images/NAMarkerR.png';
+
+				const div = document.createElement('div');
+				div.appendChild(naMarkerImage);
+
+				return new google.maps.marker.AdvancedMarkerElement({
+					position: position.toJSON(),
+					content: div
+				});
+			}
+		};
+	};
+
 	onMount(async function () {
 		const thing = 'QUl6YVN5QzRkMWNqX2ZRbVR1SDVJbTZoSkJXelRVWjNxZ2wzQjZF';
 		const loader = new Loader({
@@ -40,6 +68,7 @@
 		});
 
 		const { Map } = await loader.importLibrary('maps');
+		await google.maps.importLibrary('marker');
 
 		mapElement = document.getElementById('map') as HTMLElement;
 
@@ -56,10 +85,25 @@
 			});
 
 			await initMap(map);
-		} else {
-			console.error('Map element not found');
+
+			const markers = meetings.map((location) => {
+				const naMarkerImage = document.createElement('img');
+				naMarkerImage.src = 'images/NAMarkerR.png';
+				const position: google.maps.LatLngLiteral = {
+					lat: location.latitude,
+					lng: location.longitude
+				};
+				const div = document.createElement('div');
+				div.appendChild(naMarkerImage);
+				return new google.maps.marker.AdvancedMarkerElement({
+					position: position,
+					content: div
+				});
+			});
+
+			new MarkerClusterer({ markers, map, renderer: createCustomRenderer() });
 		}
 	});
 </script>
 
-<div id="map"></div>
+<div id="map" style="height: 500px;"></div>
