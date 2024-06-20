@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Ketchup Search</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@bmlt-enabled/croutonjs@3.19.2/crouton.min.css"/>
+</head>
+<body>
+<div id="bmlt-tabs"></div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/@bmlt-enabled/croutonjs@3.19.2/crouton.min.js"></script>
+<script type="text/javascript">
+    let crouton = new Crouton({
+        "root_server": "https://aggregator.bmltenabled.org/main_server",
+        "map_search": {latitude: 35.542053, longitude: -78.0652501, width: -100, zoom: 8, auto: true},
+        "show_distance": true,
+        "theme": "sezf",
+        "template_path": "https://cdn.jsdelivr.net/npm/@bmlt-enabled/croutonjs@3.19.2/templates",
+        "filter_tabs": true
+    });
+</script>
+</html>
