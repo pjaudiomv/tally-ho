@@ -1,24 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Ketchup Search</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href='https://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@bmlt-enabled/croutonjs@3.19.2/crouton.min.css"/>
+    <meta charset="UTF-8">
+    <title>Map of Martha's Vineyard, MA</title>
+    <style>
+        #map {
+            height: 500px;
+            width: 100%;
+        }
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js"></script>
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoicGphdWRpb212IiwiYSI6ImNrNHg3N2pvejB3NXgzam85NTY0dmhzZTMifQ.dih-WL2Dnmht7fjVVRPp1g';
+    </script>
 </head>
 <body>
-<div id="bmlt-tabs"></div>
-</body>
-<script src="https://cdn.jsdelivr.net/npm/@bmlt-enabled/croutonjs@3.19.2/crouton.min.js"></script>
-<script type="text/javascript">
-    let crouton = new Crouton({
-        "root_server": "https://aggregator.bmltenabled.org/main_server",
-        "map_search": {latitude: 35.542053, longitude: -78.0652501, width: -100, zoom: 8, auto: true},
-        "google_api_key": "AIzaSyCU1-ESvUZkRmptpNEjfRQYodOC-ZR0p8k",
-        "show_distance": true,
-        "theme": "sezf",
-        "template_path": "https://cdn.jsdelivr.net/npm/@bmlt-enabled/croutonjs@3.19.2/templates",
-        "filter_tabs": true
-    });
+<h1>Map of Martha's Vineyard, MA</h1>
+<label for="mapSelect"></label><select id="mapSelect" onchange="loadMap()">
+    <option value="google">Google Maps</option>
+    <option value="osm">OpenStreetMap</option>
+    <option value="mapbox">Mapbox</option>
+</select>
+<div id="map"></div>
+
+<script>
+    let map;
+    let mapInstance;
+    let currentMap = 'google';
+
+    function initMap() {
+        loadMap();
+    }
+
+    function loadMap() {
+        const mapType = document.getElementById('mapSelect').value;
+        const boston = { lat: 41.3945, lng: -70.6111 };
+
+        if (mapInstance) {
+            if (currentMap === 'google') {
+                mapInstance = null;
+                document.getElementById('map').innerHTML = '';
+            } else if (currentMap === 'osm' || currentMap === 'mapbox') {
+                mapInstance.remove();
+            }
+        }
+
+        if (mapType === 'google') {
+            loadGoogleMap(boston);
+        } else if (mapType === 'osm') {
+            loadOSMMap(boston);
+        } else if (mapType === 'mapbox') {
+            loadMapboxMap(boston);
+        }
+
+        currentMap = mapType;
+    }
+
+    function loadGoogleMap(boston) {
+        mapInstance = new google.maps.Map(document.getElementById('map'), {
+            center: boston,
+            zoom: 11
+        });
+        new google.maps.Marker({ position: boston, map: mapInstance });
+    }
+
+    function loadOSMMap(boston) {
+        mapInstance = L.map('map').setView([boston.lat, boston.lng], 11);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 19
+        }).addTo(mapInstance);
+        L.marker([boston.lat, boston.lng]).addTo(mapInstance);
+    }
+
+    function loadMapboxMap(boston) {
+        mapInstance = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v11',
+            center: [boston.lng, boston.lat],
+            zoom: 10
+        });
+        new mapboxgl.Marker().setLngLat([boston.lng, boston.lat]).addTo(mapInstance);
+    }
 </script>
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCU1-ESvUZkRmptpNEjfRQYodOC-ZR0p8k&callback=initMap"></script>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</body>
 </html>
+
