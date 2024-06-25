@@ -37,7 +37,7 @@
 
     function loadMap() {
         const mapType = document.getElementById('mapSelect').value;
-        const boston = { lat: 41.3945, lng: -70.6111 };
+        const vineyard = { lat: 41.3945, lng: -70.6111 };
 
         if (mapInstance) {
             if (currentMap === 'google') {
@@ -49,41 +49,41 @@
         }
 
         if (mapType === 'google') {
-            loadGoogleMap(boston);
+            loadGoogleMap(vineyard);
         } else if (mapType === 'osm') {
-            loadOSMMap(boston);
+            loadOSMMap(vineyard);
         } else if (mapType === 'mapbox') {
-            loadMapboxMap(boston);
+            loadMapboxMap(vineyard);
         }
 
         currentMap = mapType;
     }
 
-    function loadGoogleMap(boston) {
+    function loadGoogleMap(vineyard) {
         mapInstance = new google.maps.Map(document.getElementById('map'), {
-            center: boston,
+            center: vineyard,
             zoom: 11
         });
-        new google.maps.Marker({ position: boston, map: mapInstance });
+        new google.maps.Marker({ position: vineyard, map: mapInstance });
     }
 
-    function loadOSMMap(boston) {
-        mapInstance = L.map('map').setView([boston.lat, boston.lng], 11);
+    function loadOSMMap(vineyard) {
+        mapInstance = L.map('map').setView([vineyard.lat, vineyard.lng], 11);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
             maxZoom: 19
         }).addTo(mapInstance);
-        L.marker([boston.lat, boston.lng]).addTo(mapInstance);
+        L.marker([vineyard.lat, vineyard.lng]).addTo(mapInstance);
     }
 
-    function loadMapboxMap(boston) {
+    function loadMapboxMap(vineyard) {
         mapInstance = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/mapbox/streets-v11',
-            center: [boston.lng, boston.lat],
+            center: [vineyard.lng, vineyard.lat],
             zoom: 10
         });
-        new mapboxgl.Marker().setLngLat([boston.lng, boston.lat]).addTo(mapInstance);
+        new mapboxgl.Marker().setLngLat([vineyard.lng, vineyard.lat]).addTo(mapInstance);
     }
 </script>
 
