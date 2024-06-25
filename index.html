@@ -76,7 +76,7 @@
         const boston = { lat: 41.3945, lng: -70.6111 };
 
         if (mapInstance) {
-            if (currentMap === 'google') {
+            if (currentMap === 'google' || currentMap === 'azure' || currentMap === 'bing') {
                 mapInstance = null;
                 document.getElementById('map').innerHTML = '';
             } else if (currentMap === 'osm' || currentMap === 'mapbox') {
