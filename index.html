@@ -2,14 +2,45 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Map of Martha's Vineyard, MA</title>
     <style>
-        #map {
-            height: 500px;
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
             width: 100%;
+        }
+        #map {
+            height: 80vh;  /* Adjust the height to be 80% of the viewport height */
+            width: 100%;   /* Take full width of the container */
+        }
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+        }
+        select {
+            display: block;
+            margin: 0 auto 20px auto;
+            width: 90%; /* Making select a bit responsive */
+        }
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            #map {
+                height: 70vh; /* Smaller devices might need more room for content above or below */
+            }
+            h1 {
+                font-size: 1.5rem; /* Smaller header on small devices */
+            }
+            select {
+                width: 95%; /* Wider select input on smaller screens for easier access */
+            }
         }
     </style>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.css" type="text/css" />
+    <script async defer src="https://www.bing.com/api/maps/mapcontrol?key=AsXACVxx4StL1o2hBAlP1i7uoCNbDwhq7dRLbaOcwmN2unOtu1ShxlF1LJuaoOip&callback=initBingMap"></script>
+    <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css" rel="stylesheet" />
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js"></script>
     <script>
@@ -18,11 +49,12 @@
 </head>
 <body>
 <h1>Map of Martha's Vineyard, MA</h1>
-<label for="mapSelect">Choose a Map Type:</label>
-<select id="mapSelect" onchange="loadMap()">
+<label for="mapSelect"></label><select id="mapSelect" onchange="loadMap()">
+    <option value="azure">Azure Maps</option>
+    <option value="bing">Bing Maps</option>
     <option value="google">Google Maps</option>
+    <option value="mapbox" selected>Mapbox</option>
     <option value="osm">OpenStreetMap</option>
-    <option value="mapbox">Mapbox</option>
 </select>
 <div id="map"></div>
 
@@ -35,9 +67,13 @@
         loadMap();
     }
 
+    function initBingMap() {
+        loadMap();
+    }
+
     function loadMap() {
         const mapType = document.getElementById('mapSelect').value;
-        const vineyard = { lat: 41.3945, lng: -70.6111 };
+        const boston = { lat: 41.3945, lng: -70.6111 };
 
         if (mapInstance) {
             if (currentMap === 'google') {
@@ -48,42 +84,79 @@
             }
         }
 
-        if (mapType === 'google') {
-            loadGoogleMap(vineyard);
-        } else if (mapType === 'osm') {
-            loadOSMMap(vineyard);
-        } else if (mapType === 'mapbox') {
-            loadMapboxMap(vineyard);
+        switch (mapType) {
+            case 'azure':
+                loadAzureMap(boston);
+                break;
+            case 'bing':
+                loadBingMap(boston);
+                break;
+            case 'google':
+                loadGoogleMap(boston);
+                break;
+            case 'mapbox':
+                loadMapboxMap(boston);
+                break;
+            case 'osm':
+                loadOSMMap(boston);
+                break;
         }
 
         currentMap = mapType;
     }
 
-    function loadGoogleMap(vineyard) {
-        mapInstance = new google.maps.Map(document.getElementById('map'), {
-            center: vineyard,
-            zoom: 11
+    function loadAzureMap(boston) {
+        mapInstance = new atlas.Map('map', {
+            center: [boston.lng, boston.lat],
+            zoom: 10,
+            authOptions: {
+                authType: 'subscriptionKey',
+                subscriptionKey: 'rlLdxuVIMwRqaHWa6G3ny8F4CfUXsKnfA1r8hknbnCmsrsVYwmecJQQJ99AFACYeBjFaGRYkAAAgAZMPOLrE'
+            }
         });
-        new google.maps.Marker({ position: vineyard, map: mapInstance });
+        const marker = new atlas.HtmlMarker({
+            color: 'DodgerBlue',
+            text: 'M',
+            position: [boston.lng, boston.lat]
+        });
+        mapInstance.markers.add(marker);
     }
 
-    function loadOSMMap(vineyard) {
-        mapInstance = L.map('map').setView([vineyard.lat, vineyard.lng], 11);
+    function loadBingMap(boston) {
+        mapInstance = new Microsoft.Maps.Map('#map', {
+            center: new Microsoft.Maps.Location(boston.lat, boston.lng),
+            mapTypeId: Microsoft.Maps.MapTypeId.road,
+            zoom: 11
+        });
+        const pushpin = new Microsoft.Maps.Pushpin(mapInstance.getCenter(), {});
+        mapInstance.entities.push(pushpin);
+    }
+
+    function loadGoogleMap(boston) {
+        mapInstance = new google.maps.Map(document.getElementById('map'), {
+            center: boston,
+            zoom: 11
+        });
+        new google.maps.Marker({ position: boston, map: mapInstance });
+    }
+
+    function loadOSMMap(boston) {
+        mapInstance = L.map('map').setView([boston.lat, boston.lng], 11);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
             maxZoom: 19
         }).addTo(mapInstance);
-        L.marker([vineyard.lat, vineyard.lng]).addTo(mapInstance);
+        L.marker([boston.lat, boston.lng]).addTo(mapInstance);
     }
 
-    function loadMapboxMap(vineyard) {
+    function loadMapboxMap(boston) {
         mapInstance = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/mapbox/streets-v11',
-            center: [vineyard.lng, vineyard.lat],
+            center: [boston.lng, boston.lat],
             zoom: 10
         });
-        new mapboxgl.Marker().setLngLat([vineyard.lng, vineyard.lat]).addTo(mapInstance);
+        new mapboxgl.Marker().setLngLat([boston.lng, boston.lat]).addTo(mapInstance);
     }
 </script>
 
@@ -91,4 +164,3 @@
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </body>
 </html>
-
