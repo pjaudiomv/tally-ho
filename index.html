@@ -54,6 +54,12 @@
     <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css" rel="stylesheet" />
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js"></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-core.js"></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-service.js"></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
+    <script src="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.16.0/maps/maps-web.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.16.0/maps/maps.css">
     <script>
         mapboxgl.accessToken = 'pk.eyJ1IjoicGphdWRpb212IiwiYSI6ImNrNHg3N2pvejB3NXgzam85NTY0dmhzZTMifQ.dih-WL2Dnmht7fjVVRPp1g';
     </script>
@@ -65,8 +71,10 @@
     <option value="azure">Azure Maps</option>
     <option value="bing">Bing Maps</option>
     <option value="google">Google Maps</option>
+    <option value="here">Here Maps</option>
     <option value="mapbox" selected>Mapbox</option>
     <option value="osm">OpenStreetMap</option>
+    <option value="tomtom">TomTom Maps</option>
 </select>
 <div id="sidebar"></div>
 <div id="map"></div>
@@ -94,7 +102,7 @@
         document.getElementById("sidebar").innerHTML = `Longitude: ${lng.toFixed(4)} | Latitude: ${lat.toFixed(4)} | Zoom: ${zoom.toFixed(2)}`;
 
         if (mapInstance) {
-            if (['google', 'azure', 'bing'].includes(currentMap)) {
+            if (['google', 'azure', 'bing', 'here', 'tomtom'].includes(currentMap)) {
                 mapInstance = null;
                 document.getElementById('map').innerHTML = '';
             } else {
@@ -108,6 +116,8 @@
             case 'google': loadGoogleMap(vineyard); break;
             case 'mapbox': loadMapboxMap(vineyard); break;
             case 'osm': loadOSMMap(vineyard); break;
+            case 'here': loadHereMap(vineyard); break;
+            case 'tomtom': loadTomTomMap(vineyard); break;
         }
 
         currentMap = mapType;
@@ -138,6 +148,18 @@
                 break;
             case 'osm':
             case 'mapbox':
+                center = mapInstance.getCenter();
+                zoom = mapInstance.getZoom();
+                lng = center.lng;
+                lat = center.lat;
+                break;
+            case 'here':
+                center = mapInstance.getCenter();
+                zoom = mapInstance.getZoom();
+                lng = center.lng;
+                lat = center.lat;
+                break;
+            case 'tomtom':
                 center = mapInstance.getCenter();
                 zoom = mapInstance.getZoom();
                 lng = center.lng;
@@ -252,6 +274,80 @@
                 .setHTML(`Latitude: ${lngLat.lat.toFixed(4)}<br>Longitude: ${lngLat.lng.toFixed(4)}`)
                 .addTo(mapInstance);
         });
+    };
+
+    const loadTomTomMap = (vineyard) => {
+        tt.setProductInfo('VineyardMap', '1.0');
+        mapInstance = tt.map({
+            key: '1lbgTJUWkHqch0luCIG1mXsvAGJVKOkX',
+            container: 'map',
+            center: [vineyard.lng, vineyard.lat],
+            zoom: zoom - 1
+        });
+
+        marker = new tt.Marker({ draggable: true }).setLngLat([vineyard.lng, vineyard.lat]).addTo(mapInstance);
+
+        mapInstance.on('move', updateData);
+        marker.on('dragend', () => {
+            const lngLat = marker.getLngLat();
+            infowindow = new tt.Popup({ closeButton: true, closeOnClick: false })
+                .setLngLat(lngLat)
+                .setHTML(`Latitude: ${lngLat.lat.toFixed(5)}<br>Longitude: ${lngLat.lng.toFixed(5)}`)
+                .addTo(mapInstance);
+        });
+    };
+
+    const loadHereMap = (vineyard) => {
+        const platform = new H.service.Platform({
+            apikey: 'Vyu3kI3xmzyZ1UibZQN_7ES9RBZy7onolZfsQHP9IcE'
+        });
+        const defaultLayers = platform.createDefaultLayers();
+
+        mapInstance = new H.Map(document.getElementById('map'),
+            defaultLayers.vector.normal.map, {
+                center: vineyard,
+                zoom: zoom,
+                pixelRatio: window.devicePixelRatio || 1
+            });
+        window.addEventListener('resize', () => map.getViewPort().resize());
+        let behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(mapInstance));
+        let ui = H.ui.UI.createDefault(mapInstance, defaultLayers, 'en-US');
+        marker = new H.map.Marker(vineyard, {
+            volatility: true
+        });
+
+        marker.draggable = true;
+        mapInstance.addObject(marker);
+        mapInstance.addEventListener('mapviewchange', updateData);
+        mapInstance.addEventListener('dragstart', function(ev) {
+            const target = ev.target,
+                pointer = ev.currentPointer;
+            if (target instanceof H.map.Marker) {
+                let targetPosition = mapInstance.geoToScreen(target.getGeometry());
+                target['offset'] = new H.math.Point(pointer.viewportX - targetPosition.x, pointer.viewportY - targetPosition.y);
+                behavior.disable();
+            }
+        }, false);
+
+        mapInstance.addEventListener('dragend', function(ev) {
+            const target = ev.target;
+            if (target instanceof H.map.Marker) {
+                behavior.enable();
+                // const coord = mapInstance.screenToGeo(ev.currentPointer.viewportX, ev.currentPointer.viewportY);
+                // infowindow = new H.ui.InfoBubble(coord, {
+                //     content: `Latitude: ${coord.lat.toFixed(5)}<br>Longitude: ${coord.lng.toFixed(5)}`
+                // });
+                // ui.addBubble(infowindow);
+            }
+        }, false);
+
+        mapInstance.addEventListener('drag', function(ev) {
+            const target = ev.target,
+                pointer = ev.currentPointer;
+            if (target instanceof H.map.Marker) {
+                target.setGeometry(mapInstance.screenToGeo(pointer.viewportX - target['offset'].x, pointer.viewportY - target['offset'].y));
+            }
+        }, false);
     };
 </script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCU1-ESvUZkRmptpNEjfRQYodOC-ZR0p8k&callback=initMap"></script>
