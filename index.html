@@ -25,6 +25,19 @@
             width: 90%;
         }
 
+        #sidebar {
+            background-color: rgb(35 55 75 / 90%);
+            color: #fff;
+            padding: 6px 12px;
+            font-family: monospace;
+            z-index: 1000;
+            position: absolute;
+            top: 0;
+            left: 0;
+            margin: 12px;
+            border-radius: 4px;
+        }
+
         @media (max-width: 600px) {
             #map {
                 height: 70vh;
@@ -56,12 +69,17 @@
     <option value="mapbox" selected>Mapbox</option>
     <option value="osm">OpenStreetMap</option>
 </select>
+
+<div id="sidebar"></div>
 <div id="map"></div>
 
 <script>
     let map;
     let mapInstance;
     let currentMap = 'google';
+    let zoom = 11;
+    let lng = -70.6111;
+    let lat = 41.3945;
 
     function initMap() {
         loadMap();
@@ -73,7 +91,8 @@
 
     function loadMap() {
         const mapType = document.getElementById('mapSelect').value;
-        const boston = { lat: 41.3945, lng: -70.6111 };
+        const vineyard = { lat: 41.3945, lng: -70.6111 };
+        document.getElementById("sidebar").innerHTML = "Longitude: " + lng.toFixed(4) + " | Latitude: " + lat.toFixed(4) + " | Zoom: " + zoom.toFixed(2);
 
         if (mapInstance) {
             if (currentMap === 'google' || currentMap === 'azure' || currentMap === 'bing') {
@@ -86,29 +105,29 @@
 
         switch (mapType) {
             case 'azure':
-                loadAzureMap(boston);
+                loadAzureMap(vineyard);
                 break;
             case 'bing':
-                loadBingMap(boston);
+                loadBingMap(vineyard);
                 break;
             case 'google':
-                loadGoogleMap(boston);
+                loadGoogleMap(vineyard);
                 break;
             case 'mapbox':
-                loadMapboxMap(boston);
+                loadMapboxMap(vineyard);
                 break;
             case 'osm':
-                loadOSMMap(boston);
+                loadOSMMap(vineyard);
                 break;
         }
 
         currentMap = mapType;
     }
 
-    function loadAzureMap(boston) {
+    function loadAzureMap(vineyard) {
         mapInstance = new atlas.Map('map', {
-            center: [boston.lng, boston.lat],
-            zoom: 10,
+            center: [vineyard.lng, vineyard.lat],
+            zoom: zoom - 1,
             authOptions: {
                 authType: 'subscriptionKey',
                 subscriptionKey: 'rlLdxuVIMwRqaHWa6G3ny8F4CfUXsKnfA1r8hknbnCmsrsVYwmecJQQJ99AFACYeBjFaGRYkAAAgAZMPOLrE'
@@ -117,50 +136,101 @@
         const marker = new atlas.HtmlMarker({
             color: 'DodgerBlue',
             text: 'M',
-            position: [boston.lng, boston.lat]
+            position: [vineyard.lng, vineyard.lat]
         });
         mapInstance.markers.add(marker);
+        mapInstance.events.add('move', () => {
+            updateData();
+        });
     }
 
-    function loadBingMap(boston) {
+    function updateData() {
+        if (!mapInstance) return;
+
+        let center, camera;
+        switch (currentMap) {
+            case 'google':
+                center = mapInstance.getCenter();
+                zoom = mapInstance.getZoom();
+                lng = center.lng();
+                lat = center.lat();
+                break;
+            case 'azure':
+                camera = mapInstance.getCamera();
+                zoom = camera.zoom;
+                lng = camera.center[0];
+                lat = camera.center[1];
+                break;
+            case 'bing':
+                center = mapInstance.getCenter();
+                zoom = mapInstance.getZoom();
+                lng = center.longitude;
+                lat = center.latitude;
+                break;
+            case 'osm':
+            case 'mapbox':
+                center = mapInstance.getCenter();
+                zoom = mapInstance.getZoom();
+                lng = center.lng;
+                lat = center.lat;
+                break;
+            default:
+                return;
+        }
+        document.getElementById("sidebar").innerHTML = "Longitude: " + lng.toFixed(4) + " | Latitude: " + lat.toFixed(4) + " | Zoom: " + zoom.toFixed(2);
+    }
+
+    function loadBingMap(vineyard) {
         mapInstance = new Microsoft.Maps.Map('#map', {
-            center: new Microsoft.Maps.Location(boston.lat, boston.lng),
+            center: new Microsoft.Maps.Location(vineyard.lat, vineyard.lng),
             mapTypeId: Microsoft.Maps.MapTypeId.road,
-            zoom: 11
+            zoom: zoom
         });
         const pushpin = new Microsoft.Maps.Pushpin(mapInstance.getCenter(), {});
         mapInstance.entities.push(pushpin);
-    }
-
-    function loadGoogleMap(boston) {
-        mapInstance = new google.maps.Map(document.getElementById('map'), {
-            center: boston,
-            zoom: 11
+        Microsoft.Maps.Events.addHandler(mapInstance, 'viewchange', () => {
+            updateData();
         });
-        new google.maps.Marker({ position: boston, map: mapInstance });
     }
 
-    function loadOSMMap(boston) {
-        mapInstance = L.map('map').setView([boston.lat, boston.lng], 11);
+    function loadGoogleMap(vineyard) {
+        mapInstance = new google.maps.Map(document.getElementById('map'), {
+            center: vineyard,
+            zoom: zoom
+        });
+        new google.maps.Marker({ position: vineyard, map: mapInstance });
+        mapInstance.addListener('center_changed', () => {
+            updateData();
+        });
+    }
+
+    function loadOSMMap(vineyard) {
+        mapInstance = L.map('map').setView([vineyard.lat, vineyard.lng], zoom);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
             maxZoom: 19
         }).addTo(mapInstance);
-        L.marker([boston.lat, boston.lng]).addTo(mapInstance);
+        L.marker([vineyard.lat, vineyard.lng]).addTo(mapInstance);
+        mapInstance.on('move', () => {
+            updateData();
+        });
     }
 
-    function loadMapboxMap(boston) {
+    function loadMapboxMap(vineyard) {
         mapInstance = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/mapbox/streets-v11',
-            center: [boston.lng, boston.lat],
-            zoom: 10
+            center: [vineyard.lng, vineyard.lat],
+            zoom: zoom - 1
         });
-        new mapboxgl.Marker().setLngLat([boston.lng, boston.lat]).addTo(mapInstance);
+        new mapboxgl.Marker().setLngLat([vineyard.lng, vineyard.lat]).addTo(mapInstance);
+        mapInstance.on('move', () => {
+            updateData();
+        });
     }
 </script>
 
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCU1-ESvUZkRmptpNEjfRQYodOC-ZR0p8k&callback=initMap"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCH3XnwdESr1_A05jeG1s3My4xDc9MzWno&callback=initMap"></script>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </body>
 </html>
