@@ -76,6 +76,8 @@
 <script>
     let map;
     let mapInstance;
+    let marker;
+    let infowindow;
     let currentMap = 'google';
     let zoom = 11;
     let lng = -70.6111;
@@ -124,26 +126,6 @@
         currentMap = mapType;
     }
 
-    function loadAzureMap(vineyard) {
-        mapInstance = new atlas.Map('map', {
-            center: [vineyard.lng, vineyard.lat],
-            zoom: zoom - 1,
-            authOptions: {
-                authType: 'subscriptionKey',
-                subscriptionKey: 'rlLdxuVIMwRqaHWa6G3ny8F4CfUXsKnfA1r8hknbnCmsrsVYwmecJQQJ99AFACYeBjFaGRYkAAAgAZMPOLrE'
-            }
-        });
-        const marker = new atlas.HtmlMarker({
-            color: 'DodgerBlue',
-            text: 'M',
-            position: [vineyard.lng, vineyard.lat]
-        });
-        mapInstance.markers.add(marker);
-        mapInstance.events.add('move', () => {
-            updateData();
-        });
-    }
-
     function updateData() {
         if (!mapInstance) return;
 
@@ -180,16 +162,68 @@
         document.getElementById("sidebar").innerHTML = "Longitude: " + lng.toFixed(4) + " | Latitude: " + lat.toFixed(4) + " | Zoom: " + zoom.toFixed(2);
     }
 
+    function loadAzureMap(vineyard) {
+        mapInstance = new atlas.Map('map', {
+            center: [vineyard.lng, vineyard.lat],
+            zoom: zoom - 1,
+            authOptions: {
+                authType: 'subscriptionKey',
+                subscriptionKey: 'rlLdxuVIMwRqaHWa6G3ny8F4CfUXsKnfA1r8hknbnCmsrsVYwmecJQQJ99AFACYeBjFaGRYkAAAgAZMPOLrE'
+            }
+        });
+        marker = new atlas.HtmlMarker({
+            color: 'DodgerBlue',
+            text: 'M',
+            draggable: true,
+            position: [vineyard.lng, vineyard.lat]
+        });
+        mapInstance.markers.add(marker);
+        infowindow = new atlas.Popup({
+            pixelOffset: [0, -30],
+            closeButton: true
+        });
+        mapInstance.events.add('move', () => {
+            updateData();
+        });
+        mapInstance.events.add('dragend', marker, function () {
+            let lngLat = marker.getOptions().position;
+            let lat = lngLat[0];
+            let lng = lngLat[1];
+            infowindow.setOptions({
+                content: `<div style="padding: 10px;">Latitude: ${lat.toFixed(5)}, Longitude: ${lng.toFixed(5)}</div>`,
+                position: lngLat
+            });
+            infowindow.open(mapInstance);
+        });
+    }
+
     function loadBingMap(vineyard) {
         mapInstance = new Microsoft.Maps.Map('#map', {
             center: new Microsoft.Maps.Location(vineyard.lat, vineyard.lng),
             mapTypeId: Microsoft.Maps.MapTypeId.road,
             zoom: zoom
         });
-        const pushpin = new Microsoft.Maps.Pushpin(mapInstance.getCenter(), {});
-        mapInstance.entities.push(pushpin);
+        marker = new Microsoft.Maps.Pushpin(mapInstance.getCenter(), {
+            draggable: true
+        });
+        mapInstance.entities.push(marker);
         Microsoft.Maps.Events.addHandler(mapInstance, 'viewchange', () => {
             updateData();
+        });
+        infowindow = new Microsoft.Maps.Infobox(mapInstance.getCenter(), {
+            visible: false,
+            showCloseButton: true
+        });
+        infowindow.setMap(mapInstance);
+        Microsoft.Maps.Events.addHandler(marker, 'dragend', function () {
+            let lngLat = marker.getLocation();
+            let lat = lngLat.latitude.toFixed(5);
+            let lng = lngLat.longitude.toFixed(5);
+            infowindow.setLocation(lngLat);
+            infowindow.setOptions({
+                visible: true,
+                description: "Latitude: " + lat + "<br>Longitude: " + lng
+            });
         });
     }
 
@@ -198,9 +232,23 @@
             center: vineyard,
             zoom: zoom
         });
-        new google.maps.Marker({ position: vineyard, map: mapInstance });
+        marker = new google.maps.Marker({
+            position: vineyard,
+            map: mapInstance,
+            draggable: true
+        });
         mapInstance.addListener('center_changed', () => {
             updateData();
+        });
+        infowindow = new google.maps.InfoWindow({
+            content: "Initial location"
+        });
+
+        marker.addListener("dragend", function(event) {
+            let lat = event.latLng.lat();
+            let lng = event.latLng.lng();
+            infowindow.setContent("Latitude: " + lat.toFixed(5) + "<br>Longitude: " + lng.toFixed(5));
+            infowindow.open(map, marker);
         });
     }
 
@@ -210,9 +258,20 @@
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
             maxZoom: 19
         }).addTo(mapInstance);
-        L.marker([vineyard.lat, vineyard.lng]).addTo(mapInstance);
+        marker = L.marker([vineyard.lat, vineyard.lng], {
+            draggable: true
+        }).addTo(mapInstance);
         mapInstance.on('move', () => {
             updateData();
+        });
+        infowindow = L.popup();
+        marker.on('dragend', function() {
+            let lngLat = marker.getLatLng();
+            let lat = lngLat.lat;
+            let lng = lngLat.lng;
+            infowindow.setLatLng(lngLat)
+                .setContent("Latitude: " + lat.toFixed(5) + "<br>Longitude: " + lng.toFixed(5))
+                .openOn(mapInstance);
         });
     }
 
@@ -223,13 +282,28 @@
             center: [vineyard.lng, vineyard.lat],
             zoom: zoom - 1
         });
-        new mapboxgl.Marker().setLngLat([vineyard.lng, vineyard.lat]).addTo(mapInstance);
+        marker = new mapboxgl.Marker({
+            draggable: true
+        }).setLngLat([vineyard.lng, vineyard.lat]).addTo(mapInstance);
         mapInstance.on('move', () => {
             updateData();
+        });
+        infowindow = new mapboxgl.Popup({
+            closeButton: true,
+            closeOnClick: false
+        });
+        marker.on('dragend', function() {
+            let lngLat = marker.getLngLat();
+            let lat = lngLat.lat;
+            let lng = lngLat.lng;
+            infowindow.setLngLat(lngLat)
+                .setHTML("Latitude: " + lat.toFixed(5) + "<br>Longitude: " + lng.toFixed(5))
+                    .addTo(mapInstance);
         });
     }
 </script>
 
+<!--  -->
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCU1-ESvUZkRmptpNEjfRQYodOC-ZR0p8k&callback=initMap"></script>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </body>
