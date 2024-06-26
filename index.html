@@ -309,7 +309,7 @@
                 zoom: zoom,
                 pixelRatio: window.devicePixelRatio || 1
             });
-        window.addEventListener('resize', () => map.getViewPort().resize());
+        window.addEventListener('resize', () => mapInstance.getViewPort().resize());
         let behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(mapInstance));
         let ui = H.ui.UI.createDefault(mapInstance, defaultLayers, 'en-US');
         marker = new H.map.Marker(vineyard, {
@@ -319,6 +319,7 @@
         marker.draggable = true;
         mapInstance.addObject(marker);
         mapInstance.addEventListener('mapviewchange', updateData);
+
         mapInstance.addEventListener('dragstart', function(ev) {
             const target = ev.target,
                 pointer = ev.currentPointer;
@@ -333,11 +334,11 @@
             const target = ev.target;
             if (target instanceof H.map.Marker) {
                 behavior.enable();
-                // const coord = mapInstance.screenToGeo(ev.currentPointer.viewportX, ev.currentPointer.viewportY);
-                // infowindow = new H.ui.InfoBubble(coord, {
-                //     content: `Latitude: ${coord.lat.toFixed(5)}<br>Longitude: ${coord.lng.toFixed(5)}`
-                // });
-                // ui.addBubble(infowindow);
+                const coord = mapInstance.screenToGeo(ev.currentPointer.viewportX, ev.currentPointer.viewportY);
+                infowindow = new H.ui.InfoBubble(coord, {
+                    content: `Latitude: ${coord.lat.toFixed(5)}<br>Longitude: ${coord.lng.toFixed(5)}`
+                });
+                ui.addBubble(infowindow);
             }
         }, false);
 
