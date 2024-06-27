@@ -23,13 +23,22 @@
             margin-top: 10px;
         }
 
-        select {
-            display: block;
-            margin: 10px auto;
-            width: 90%;
+        #mapControls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 10px 0;
         }
 
-        #sidebar {
+        label {
+            margin-right: 10px;
+        }
+
+        select {
+            width: 200px;
+        }
+
+        #mapInfoDisplay {
             background-color: rgb(35 55 75 / 90%);
             color: #fff;
             padding: 6px 12px;
@@ -40,12 +49,7 @@
             left: 0;
             margin: 12px;
             border-radius: 4px;
-        }
-
-        label[for="mapSelect"] {
-            display: block;
-            text-align: center;
-            margin: 10px 0;
+            width: 500px;
         }
 
         @media (max-width: 600px) {
@@ -56,14 +60,15 @@
                 font-size: 1.5rem;
             }
             select {
-                width: 95%;
+                width: 65%;
             }
             h1 {
                 margin-top: 5px; /* Adjust top margin to prevent overlap */
             }
-            #sidebar {
+            #mapInfoDisplay {
                 margin-top: 10px;
                 position: relative;
+                width: 95%;
             }
         }
     </style>
@@ -86,16 +91,19 @@
 </head>
 <body>
 <h1>Map of Martha's Vineyard, MA</h1>
-<select id="mapSelect" onchange="loadMap()">
-    <option value="azure">Azure Maps</option>
-    <option value="bing">Bing Maps</option>
-    <option value="google">Google Maps</option>
-    <option value="here">Here Maps</option>
-    <option value="mapbox" selected>Mapbox</option>
-    <option value="osm">OpenStreetMap</option>
-    <option value="tomtom">TomTom Maps</option>
-</select>
-<div id="sidebar"></div>
+<div id="mapControls">
+    <label for="mapSelect">Select a map</label>
+    <select id="mapSelect" onchange="loadMap()">
+        <option value="azure">Azure Maps</option>
+        <option value="bing">Bing Maps</option>
+        <option value="google">Google Maps</option>
+        <option value="here">Here Maps</option>
+        <option value="mapbox" selected>Mapbox</option>
+        <option value="osm">OpenStreetMap</option>
+        <option value="tomtom">TomTom Maps</option>
+    </select>
+</div>
+<div id="mapInfoDisplay"></div>
 <div id="map"></div>
 
 <script>
@@ -118,7 +126,7 @@
     const loadMap = () => {
         const mapType = document.getElementById('mapSelect').value;
         const vineyard = { lat: 41.3945, lng: -70.6111 };
-        document.getElementById("sidebar").innerHTML = `Longitude: ${lng.toFixed(4)} | Latitude: ${lat.toFixed(4)} | Zoom: ${zoom.toFixed(2)}`;
+        document.getElementById("mapInfoDisplay").innerHTML = `Longitude: ${lng.toFixed(4)} | Latitude: ${lat.toFixed(4)} | Zoom: ${zoom.toFixed(2)}`;
 
         if (mapInstance) {
             if (['google', 'azure', 'bing', 'here', 'tomtom'].includes(currentMap)) {
@@ -176,7 +184,7 @@
                 break;
             default: return;
         }
-        document.getElementById("sidebar").innerHTML = `Longitude: ${lng.toFixed(4)} | Latitude: ${lat.toFixed(4)} | Zoom: ${zoom.toFixed(0)}`;
+        document.getElementById("mapInfoDisplay").innerHTML = `Longitude: ${lng.toFixed(4)} | Latitude: ${lat.toFixed(4)} | Zoom: ${zoom.toFixed(0)}`;
     };
 
     const loadAzureMap = (vineyard) => {
