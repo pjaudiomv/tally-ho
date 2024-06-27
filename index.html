@@ -10,32 +10,44 @@
             padding: 0;
             height: 100%;
             width: 100%;
+            box-sizing: border-box;
         }
+
         #map {
             height: 80vh;
             width: 100%;
         }
+
         h1 {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 10px;
         }
+
         select {
             display: block;
-            margin: 0 auto 20px auto;
+            margin: 10px auto;
             width: 90%;
         }
+
         #sidebar {
             background-color: rgb(35 55 75 / 90%);
             color: #fff;
             padding: 6px 12px;
             font-family: monospace;
             z-index: 1000;
-            position: absolute;
+            position: relative;
             top: 0;
             left: 0;
             margin: 12px;
             border-radius: 4px;
         }
+
+        label[for="mapSelect"] {
+            display: block;
+            text-align: center;
+            margin: 10px 0;
+        }
+
         @media (max-width: 600px) {
             #map {
                 height: 70vh;
@@ -46,27 +58,34 @@
             select {
                 width: 95%;
             }
+            h1 {
+                margin-top: 5px; /* Adjust top margin to prevent overlap */
+            }
+            #sidebar {
+                margin-top: 10px;
+                position: relative;
+            }
         }
     </style>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.css" />
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css" />
+    <link rel="stylesheet" href="https://js.api.here.com/v3/3.1/mapsjs-ui.css" />
+    <link rel="stylesheet" type="text/css" href="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.16.0/maps/maps.css">
     <script async defer src="https://www.bing.com/api/maps/mapcontrol?key=AsXACVxx4StL1o2hBAlP1i7uoCNbDwhq7dRLbaOcwmN2unOtu1ShxlF1LJuaoOip&callback=initBingMap"></script>
     <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.js"></script>
-    <link href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css" rel="stylesheet" />
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js"></script>
     <script src="https://js.api.here.com/v3/3.1/mapsjs-core.js"></script>
     <script src="https://js.api.here.com/v3/3.1/mapsjs-service.js"></script>
     <script src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"></script>
     <script src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
     <script src="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.16.0/maps/maps-web.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.16.0/maps/maps.css">
     <script>
         mapboxgl.accessToken = 'pk.eyJ1IjoicGphdWRpb212IiwiYSI6ImNrNHg3N2pvejB3NXgzam85NTY0dmhzZTMifQ.dih-WL2Dnmht7fjVVRPp1g';
     </script>
 </head>
 <body>
 <h1>Map of Martha's Vineyard, MA</h1>
-<label for="mapSelect"></label>
 <select id="mapSelect" onchange="loadMap()">
     <option value="azure">Azure Maps</option>
     <option value="bing">Bing Maps</option>
@@ -146,19 +165,9 @@
                 lng = center.longitude;
                 lat = center.latitude;
                 break;
+            case 'here':
             case 'osm':
             case 'mapbox':
-                center = mapInstance.getCenter();
-                zoom = mapInstance.getZoom();
-                lng = center.lng;
-                lat = center.lat;
-                break;
-            case 'here':
-                center = mapInstance.getCenter();
-                zoom = mapInstance.getZoom();
-                lng = center.lng;
-                lat = center.lat;
-                break;
             case 'tomtom':
                 center = mapInstance.getCenter();
                 zoom = mapInstance.getZoom();
@@ -335,6 +344,9 @@
             if (target instanceof H.map.Marker) {
                 behavior.enable();
                 const coord = mapInstance.screenToGeo(ev.currentPointer.viewportX, ev.currentPointer.viewportY);
+                if (infowindow) {
+                    ui.removeBubble(infowindow);
+                }
                 infowindow = new H.ui.InfoBubble(coord, {
                     content: `Latitude: ${coord.lat.toFixed(5)}<br>Longitude: ${coord.lng.toFixed(5)}`
                 });
