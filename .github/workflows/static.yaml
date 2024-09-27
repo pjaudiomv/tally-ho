@@ -29,6 +29,7 @@ jobs:
         run: |
           npm ci
           npm run build
+          cp map.html dist
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

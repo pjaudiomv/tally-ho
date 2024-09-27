@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map of Martha's Vineyard, MA</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        #map {
+            height: 80vh;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        #mapControls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        label {
+            margin-right: 10px;
+        }
+
+        select {
+            width: 200px;
+        }
+
+        #mapInfoDisplay {
+            background-color: rgb(35 55 75 / 90%);
+            color: #fff;
+            padding: 6px 12px;
+            font-family: monospace;
+            z-index: 1000;
+            position: relative;
+            top: 0;
+            left: 0;
+            margin: 12px;
+            border-radius: 4px;
+            width: 500px;
+        }
+
+        @media (max-width: 600px) {
+            #map {
+                height: 70vh;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            select {
+                width: 65%;
+            }
+            h1 {
+                margin-top: 5px; /* Adjust top margin to prevent overlap */
+            }
+            #mapInfoDisplay {
+                margin-top: 10px;
+                position: relative;
+                width: 95%;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.css" />
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css" />
+    <link rel="stylesheet" href="https://js.api.here.com/v3/3.1/mapsjs-ui.css" />
+    <link rel="stylesheet" type="text/css" href="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.16.0/maps/maps.css">
+    <script async defer src="https://www.bing.com/api/maps/mapcontrol?key=AsXACVxx4StL1o2hBAlP1i7uoCNbDwhq7dRLbaOcwmN2unOtu1ShxlF1LJuaoOip&callback=initBingMap"></script>
+    <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js"></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-core.js"></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-service.js"></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
+    <script src="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.16.0/maps/maps-web.min.js"></script>
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoicGphdWRpb212IiwiYSI6ImNrNHg3N2pvejB3NXgzam85NTY0dmhzZTMifQ.dih-WL2Dnmht7fjVVRPp1g';
+    </script>
+</head>
+<body>
+<h1>Map of Martha's Vineyard, MA</h1>
+<div id="mapControls">
+    <label for="mapSelect">Select a map</label>
+    <select id="mapSelect" onchange="loadMap()">
+        <option value="azure">Azure Maps</option>
+        <option value="bing">Bing Maps</option>
+        <option value="google">Google Maps</option>
+        <option value="here">Here Maps</option>
+        <option value="mapbox" selected>Mapbox</option>
+        <option value="osm">OpenStreetMap</option>
+        <option value="tomtom">TomTom Maps</option>
+    </select>
+</div>
+<div id="mapInfoDisplay"></div>
+<div id="map"></div>
+
+<script>
+    let mapInstance;
+    let marker;
+    let infowindow;
+    let currentMap = 'google';
+    let zoom = 11;
+    let lng = -70.6111;
+    let lat = 41.3945;
+
+    function initMap() {
+        loadMap();
+    }
+
+    function initBingMap() {
+        loadMap();
+    }
+
+    const loadMap = () => {
+        const mapType = document.getElementById('mapSelect').value;
+        const vineyard = { lat: 41.3945, lng: -70.6111 };
+        document.getElementById("mapInfoDisplay").innerHTML = `Longitude: ${lng.toFixed(4)} | Latitude: ${lat.toFixed(4)} | Zoom: ${zoom.toFixed(2)}`;
+
+        if (mapInstance) {
+            if (['google', 'azure', 'bing', 'here', 'tomtom'].includes(currentMap)) {
+                mapInstance = null;
+                document.getElementById('map').innerHTML = '';
+            } else {
+                mapInstance.remove();
+            }
+        }
+
+        switch (mapType) {
+            case 'azure': loadAzureMap(vineyard); break;
+            case 'bing': loadBingMap(vineyard); break;
+            case 'google': loadGoogleMap(vineyard); break;
+            case 'mapbox': loadMapboxMap(vineyard); break;
+            case 'osm': loadOSMMap(vineyard); break;
+            case 'here': loadHereMap(vineyard); break;
+            case 'tomtom': loadTomTomMap(vineyard); break;
+        }
+
+        currentMap = mapType;
+    };
+
+    const updateData = () => {
+        if (!mapInstance) return;
+
+        let center, camera;
+        switch (currentMap) {
+            case 'google':
+                center = mapInstance.getCenter();
+                zoom = mapInstance.getZoom();
+                lng = center.lng();
+                lat = center.lat();
+                break;
+            case 'azure':
+                camera = mapInstance.getCamera();
+                zoom = camera.zoom;
+                lng = camera.center[0];
+                lat = camera.center[1];
+                break;
+            case 'bing':
+                center = mapInstance.getCenter();
+                zoom = mapInstance.getZoom();
+                lng = center.longitude;
+                lat = center.latitude;
+                break;
+            case 'here':
+            case 'osm':
+            case 'mapbox':
+            case 'tomtom':
+                center = mapInstance.getCenter();
+                zoom = mapInstance.getZoom();
+                lng = center.lng;
+                lat = center.lat;
+                break;
+            default: return;
+        }
+        document.getElementById("mapInfoDisplay").innerHTML = `Longitude: ${lng.toFixed(4)} | Latitude: ${lat.toFixed(4)} | Zoom: ${zoom.toFixed(0)}`;
+    };
+
+    const loadAzureMap = (vineyard) => {
+        mapInstance = new atlas.Map('map', {
+            center: [vineyard.lng, vineyard.lat],
+            zoom: zoom - 1,
+            authOptions: {
+                authType: 'subscriptionKey',
+                subscriptionKey: 'rlLdxuVIMwRqaHWa6G3ny8F4CfUXsKnfA1r8hknbnCmsrsVYwmecJQQJ99AFACYeBjFaGRYkAAAgAZMPOLrE'
+            }
+        });
+        marker = new atlas.HtmlMarker({
+            color: 'DodgerBlue',
+            text: 'M',
+            draggable: true,
+            position: [vineyard.lng, vineyard.lat]
+        });
+        mapInstance.markers.add(marker);
+        infowindow = new atlas.Popup({
+            pixelOffset: [0, -30],
+            closeButton: true
+        });
+        mapInstance.events.add('move', updateData);
+        mapInstance.events.add('dragend', marker, () => {
+            const lngLat = marker.getOptions().position;
+            infowindow.setOptions({
+                content: `<div style="padding: 10px;">Latitude: ${lngLat[1].toFixed(4)}<br>Longitude: ${lngLat[0].toFixed(4)}</div>`,
+                position: lngLat
+            });
+            infowindow.open(mapInstance);
+        });
+    };
+
+    const loadBingMap = (vineyard) => {
+        mapInstance = new Microsoft.Maps.Map('#map', {
+            center: new Microsoft.Maps.Location(vineyard.lat, vineyard.lng),
+            mapTypeId: Microsoft.Maps.MapTypeId.road,
+            zoom: zoom
+        });
+        marker = new Microsoft.Maps.Pushpin(mapInstance.getCenter(), { draggable: true });
+        mapInstance.entities.push(marker);
+        Microsoft.Maps.Events.addHandler(mapInstance, 'viewchange', updateData);
+        infowindow = new Microsoft.Maps.Infobox(mapInstance.getCenter(), { visible: false, showCloseButton: true });
+        infowindow.setMap(mapInstance);
+        Microsoft.Maps.Events.addHandler(marker, 'dragend', () => {
+            const lngLat = marker.getLocation();
+            infowindow.setLocation(lngLat);
+            infowindow.setOptions({
+                visible: true,
+                description: `Latitude: ${lngLat.latitude.toFixed(4)}<br>Longitude: ${lngLat.longitude.toFixed(4)}`
+            });
+        });
+    };
+
+    const loadGoogleMap = (vineyard) => {
+        mapInstance = new google.maps.Map(document.getElementById('map'), {
+            center: vineyard,
+            zoom: zoom
+        });
+        marker = new google.maps.Marker({
+            position: vineyard,
+            map: mapInstance,
+            draggable: true
+        });
+        mapInstance.addListener('center_changed', updateData);
+        infowindow = new google.maps.InfoWindow({ content: "Initial location" });
+
+        marker.addListener("dragend", (event) => {
+            infowindow.setContent(`Latitude: ${event.latLng.lat().toFixed(4)}<br>Longitude: ${event.latLng.lng().toFixed(4)}`);
+            infowindow.open(mapInstance, marker);
+        });
+    };
+
+    const loadOSMMap = (vineyard) => {
+        mapInstance = L.map('map').setView([vineyard.lat, vineyard.lng], zoom);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 19
+        }).addTo(mapInstance);
+        marker = L.marker([vineyard.lat, vineyard.lng], { draggable: true }).addTo(mapInstance);
+        mapInstance.on('move', updateData);
+        infowindow = L.popup();
+        marker.on('dragend', () => {
+            const lngLat = marker.getLatLng();
+            infowindow.setLatLng(lngLat)
+                .setContent(`Latitude: ${lngLat.lat.toFixed(4)}<br>Longitude: ${lngLat.lng.toFixed(4)}`)
+                .openOn(mapInstance);
+        });
+    };
+
+    const loadMapboxMap = (vineyard) => {
+        mapInstance = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v11',
+            center: [vineyard.lng, vineyard.lat],
+            zoom: zoom - 1
+        });
+        marker = new mapboxgl.Marker({ draggable: true }).setLngLat([vineyard.lng, vineyard.lat]).addTo(mapInstance);
+        mapInstance.on('move', updateData);
+        infowindow = new mapboxgl.Popup({ closeButton: true, closeOnClick: false });
+        marker.on('dragend', () => {
+            const lngLat = marker.getLngLat();
+            infowindow.setLngLat(lngLat)
+                .setHTML(`Latitude: ${lngLat.lat.toFixed(4)}<br>Longitude: ${lngLat.lng.toFixed(4)}`)
+                .addTo(mapInstance);
+        });
+    };
+
+    const loadTomTomMap = (vineyard) => {
+        tt.setProductInfo('VineyardMap', '1.0');
+        mapInstance = tt.map({
+            key: '1lbgTJUWkHqch0luCIG1mXsvAGJVKOkX',
+            container: 'map',
+            center: [vineyard.lng, vineyard.lat],
+            zoom: zoom - 1
+        });
+
+        marker = new tt.Marker({ draggable: true }).setLngLat([vineyard.lng, vineyard.lat]).addTo(mapInstance);
+
+        mapInstance.on('move', updateData);
+        marker.on('dragend', () => {
+            const lngLat = marker.getLngLat();
+            infowindow = new tt.Popup({ closeButton: true, closeOnClick: false })
+                .setLngLat(lngLat)
+                .setHTML(`Latitude: ${lngLat.lat.toFixed(5)}<br>Longitude: ${lngLat.lng.toFixed(5)}`)
+                .addTo(mapInstance);
+        });
+    };
+
+    const loadHereMap = (vineyard) => {
+        const platform = new H.service.Platform({
+            apikey: 'Vyu3kI3xmzyZ1UibZQN_7ES9RBZy7onolZfsQHP9IcE'
+        });
+        const defaultLayers = platform.createDefaultLayers();
+
+        mapInstance = new H.Map(document.getElementById('map'),
+            defaultLayers.vector.normal.map, {
+                center: vineyard,
+                zoom: zoom,
+                pixelRatio: window.devicePixelRatio || 1
+            });
+        window.addEventListener('resize', () => mapInstance.getViewPort().resize());
+        let behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(mapInstance));
+        let ui = H.ui.UI.createDefault(mapInstance, defaultLayers, 'en-US');
+        marker = new H.map.Marker(vineyard, {
+            volatility: true
+        });
+
+        marker.draggable = true;
+        mapInstance.addObject(marker);
+        mapInstance.addEventListener('mapviewchange', updateData);
+
+        mapInstance.addEventListener('dragstart', function(ev) {
+            const target = ev.target,
+                pointer = ev.currentPointer;
+            if (target instanceof H.map.Marker) {
+                let targetPosition = mapInstance.geoToScreen(target.getGeometry());
+                target['offset'] = new H.math.Point(pointer.viewportX - targetPosition.x, pointer.viewportY - targetPosition.y);
+                behavior.disable();
+            }
+        }, false);
+
+        mapInstance.addEventListener('dragend', function(ev) {
+            const target = ev.target;
+            if (target instanceof H.map.Marker) {
+                behavior.enable();
+                const coord = mapInstance.screenToGeo(ev.currentPointer.viewportX, ev.currentPointer.viewportY);
+                if (infowindow) {
+                    ui.removeBubble(infowindow);
+                }
+                infowindow = new H.ui.InfoBubble(coord, {
+                    content: `Latitude: ${coord.lat.toFixed(5)}<br>Longitude: ${coord.lng.toFixed(5)}`
+                });
+                ui.addBubble(infowindow);
+            }
+        }, false);
+
+        mapInstance.addEventListener('drag', function(ev) {
+            const target = ev.target,
+                pointer = ev.currentPointer;
+            if (target instanceof H.map.Marker) {
+                target.setGeometry(mapInstance.screenToGeo(pointer.viewportX - target['offset'].x, pointer.viewportY - target['offset'].y));
+            }
+        }, false);
+    };
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCU1-ESvUZkRmptpNEjfRQYodOC-ZR0p8k&callback=initMap"></script>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</body>
+</html>
