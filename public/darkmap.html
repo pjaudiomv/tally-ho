@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Meeting Finder</title>
+    <style type="text/css">
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: black;
+                color: white;
+            }
+            #tsml-ui {
+                --alert-background: #191919;
+                --alert-text: #bbb;
+                --background: #000;
+                --in-person: #66aa66;
+                --link: #6699cc;
+                --online: #6699cc;
+                --text: #fff;
+            }
+        }
+    </style>
+</head>
+<body>
+<div
+    id="tsml-ui"
+    data-src="https://bmlt.nerna.org/main_server/client_interface/tsml/?switcher=GetSearchResults&services=8"
+    data-timezone="America/New_York"
+></div>
+<script>
+var tsml_react_config = {
+    feedback_emails: ['meetings@aasanjose.org'],
+    map: {
+        tiles_dark: {
+            attribution: `&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors`,
+            url: 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png',
+        },
+    },
+};
+</script>
+<script src="https://app.patrickjoyce.dev/app.js" async></script>
+</body>
+</html>
