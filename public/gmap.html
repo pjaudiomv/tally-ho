@@ -33,15 +33,24 @@
     <p>Before implimenting this code, you would want to update the lat and long to the variables used in your application.</p>
 </div>
 <script>
-    function mapsSelector() {
-        if /* if we're on iOS, open in Apple Maps */
-        ((navigator.platform.indexOf("iPhone") != -1) ||
-            (navigator.platform.indexOf("iPod") != -1) ||
-            (navigator.platform.indexOf("iPad") != -1))
-            window.open("maps://maps.google.com/maps?daddr=lat,long&amp;ll=");
+    function isIOSDevice() {
+        if (navigator.userAgentData && navigator.userAgentData.platform) {
+            if (navigator.userAgentData.platform === 'iOS') {
+                return true;
+            }
+        }
+        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+        const isIPadOS = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1 && !window.MSStream;
+        return isIOS || isIPadOS;
+    }
 
-        else /* else use Google */
-            window.open("https://maps.google.com/maps?daddr=lat,long&amp;ll=");
+    function mapsSelector() {
+        if (isIOSDevice())
+            window.open("maps://maps.google.com/maps?daddr=33.06661863762794,-80.10240586&amp;ll=");
+
+        else
+            window.open("https://maps.google.com/maps?daddr=33.06661863762794,-80.10240586&amp;ll=");
     }
 </script>
 </body>
