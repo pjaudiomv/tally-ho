@@ -3,36 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Map Link</title>
+    <title>Map App Selector</title>
     <style>
         .maps-link {
             margin: 0 auto;
             width: 150px;
             padding: 20px 0;
+        }
 
-            img { width: 150px; }
+        .maps-link img {
+            width: 150px;
+            cursor: pointer;
         }
 
         .details {
             width: 600px;
             margin: 0 auto;
-            font-family: "Open Sans";
+            font-family: "Open Sans", sans-serif;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 20px;
+            font-family: "Open Sans", sans-serif;
+        }
+
+        .map-option {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: "Open Sans", sans-serif;
+        }
+
+        .map-option:hover {
+            border-color: #4285f4;
+            background-color: #f8f9fa;
+        }
+
+        .map-option img {
+            width: 40px;
+            height: 40px;
+            margin-right: 15px;
+            border-radius: 8px;
+        }
+
+        .map-option-text {
+            flex: 1;
+        }
+
+        .map-option-title {
+            font-weight: bold;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .map-option-desc {
+            font-size: 14px;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .cancel-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            background-color: #f5f5f5;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: "Open Sans", sans-serif;
+            font-size: 14px;
+        }
+
+        .cancel-btn:hover {
+            background-color: #e0e0e0;
         }
     </style>
 </head>
 <body>
 <div class="maps-link">
-    <img style="cursor: pointer;" onclick="mapsSelector()" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/747/maps-icon.png" />
+    <img onclick="showMapSelector()" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/747/maps-icon.png" alt="Open Maps" />
 </div>
 
 <div class="details">
-    <p>The above icon is liked to Google Maps. It uses a small library to detect whether or not the user is on iOS.</p>
+    <p>The above icon will show you options for different map applications. You can choose between Google Maps, Apple Maps, Waze, or other mapping services based on what you have installed.</p>
 
-    <p>By doing this, we can ensure that all users on iOS and Android will have this link open in their native maps app. If the user is on desktop, they will get Google Maps on desktop.</p>
+    <p>The selector automatically detects your device type and shows relevant options. Mobile users will see native app options, while desktop users will see web-based alternatives.</p>
 
-    <p>Before implimenting this code, you would want to update the lat and long to the variables used in your application.</p>
+    <p>Before implementing this code, update the latitude and longitude coordinates to match your specific location.</p>
 </div>
+
+<!-- Modal for map selection -->
+<div id="mapModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <div class="modal-header">
+            <h3>Choose a Map App</h3>
+            <p>Select your preferred navigation app:</p>
+        </div>
+        <div id="mapOptions">
+            <!-- Options will be populated by JavaScript -->
+        </div>
+        <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+    </div>
+</div>
+
 <script>
+    // Coordinates - update these for your location
+    const latitude = 33.06661863762794;
+    const longitude = -80.10240586;
+
     function isIOSDevice() {
         if (navigator.userAgentData && navigator.userAgentData.platform) {
             if (navigator.userAgentData.platform === 'iOS') {
@@ -45,13 +166,113 @@
         return isIOS || isIPadOS;
     }
 
-    function mapsSelector() {
-        if (isIOSDevice())
-            window.open("maps://maps.google.com/maps?daddr=33.06661863762794,-80.10240586&amp;ll=");
-
-        else
-            window.open("https://maps.google.com/maps?daddr=33.06661863762794,-80.10240586&amp;ll=");
+    function isAndroidDevice() {
+        return /Android/i.test(navigator.userAgent);
     }
+
+    function isMobileDevice() {
+        return isIOSDevice() || isAndroidDevice() || /Mobi|Android/i.test(navigator.userAgent);
+    }
+
+    function getMapOptions() {
+        const options = [];
+        const isMobile = isMobileDevice();
+        const isIOS = isIOSDevice();
+        const isAndroid = isAndroidDevice();
+
+        // Google Maps (always available)
+        options.push({
+            name: "Google Maps",
+            description: isMobile ? "Open in Google Maps app" : "Open in web browser",
+            icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234285f4'%3E%3Cpath d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z'/%3E%3C/svg%3E",
+            url: isMobile
+                ? `https://maps.google.com/maps?daddr=${latitude},${longitude}&ll=`
+                : `https://maps.google.com/maps?daddr=${latitude},${longitude}&ll=`
+        });
+
+        // Apple Maps (iOS only)
+        if (isIOS) {
+            options.push({
+                name: "Apple Maps",
+                description: "Open in Apple Maps app",
+                icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23007AFF'%3E%3Cpath d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z'/%3E%3C/svg%3E",
+                url: `https://maps.apple.com/maps?daddr=${latitude},${longitude}&ll=`
+            });
+        }
+
+        // Waze (mobile devices)
+        if (isMobile) {
+            options.push({
+                name: "Waze",
+                description: "Open in Waze app",
+                icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300D4FF'%3E%3Cpath d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z'/%3E%3C/svg%3E",
+                url: `https://waze.com/ul?ll=${latitude},${longitude}&navigate=yes`
+            });
+        }
+
+        // Bing Maps (desktop fallback)
+        if (!isMobile) {
+            options.push({
+                name: "Bing Maps",
+                description: "Open in web browser",
+                icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23008575'%3E%3Cpath d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z'/%3E%3C/svg%3E",
+                url: `https://www.bing.com/maps?where1=${latitude},${longitude}`
+            });
+        }
+
+        return options;
+    }
+
+    function showMapSelector() {
+        const modal = document.getElementById('mapModal');
+        const optionsContainer = document.getElementById('mapOptions');
+
+        // Clear existing options
+        optionsContainer.innerHTML = '';
+
+        // Get available map options
+        const options = getMapOptions();
+
+        // Create option elements
+        options.forEach(option => {
+            const optionElement = document.createElement('div');
+            optionElement.className = 'map-option';
+            optionElement.onclick = () => openMap(option.url);
+
+            optionElement.innerHTML = `
+                <img src="${option.icon}" alt="${option.name}">
+                <div class="map-option-text">
+                    <div class="map-option-title">${option.name}</div>
+                    <div class="map-option-desc">${option.description}</div>
+                </div>
+            `;
+
+            optionsContainer.appendChild(optionElement);
+        });
+
+        // Show modal
+        modal.style.display = 'block';
+    }
+
+    function openMap(url) {
+        window.open(url, '_blank');
+        closeModal();
+    }
+
+    function closeModal() {
+        document.getElementById('mapModal').style.display = 'none';
+    }
+
+    // Close modal when clicking outside of it
+    window.onclick = function(event) {
+        const modal = document.getElementById('mapModal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
+
+    // Close modal with X button
+    document.querySelector('.close').onclick = closeModal;
 </script>
 </body>
 </html>
