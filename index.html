@@ -533,6 +533,29 @@
             That's dedication! 🎉
         </div>
 
+        <div style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); padding: 30px; border-radius: 12px; color: white; margin-bottom: 40px; text-align: center;">
+            <h2 style="margin-bottom: 20px; font-size: 2em;">⏱️ Estimated Development Time</h2>
+            <div style="font-size: 3em; font-weight: bold; margin: 20px 0;" id="totalHours">-</div>
+            <div style="font-size: 1.3em; opacity: 0.95; margin-bottom: 20px;">Total Hours Invested</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 30px;">
+                <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 8px;">
+                    <div style="font-size: 2em; font-weight: bold;" id="avgTimePerCommit">-</div>
+                    <div style="opacity: 0.9;">Avg Time per Commit</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 8px;">
+                    <div style="font-size: 2em; font-weight: bold;" id="workWeeks">-</div>
+                    <div style="opacity: 0.9;">Work Weeks (40hrs)</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 8px;">
+                    <div style="font-size: 2em; font-weight: bold;" id="linesPerHour">-</div>
+                    <div style="opacity: 0.9;">Lines Added per Hour</div>
+                </div>
+            </div>
+            <div style="margin-top: 25px; font-size: 0.95em; opacity: 0.85;">
+                * Estimated using industry averages: ~2-3 hours per commit including planning, coding, testing, and review
+            </div>
+        </div>
+
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 12px; color: white; margin-bottom: 40px;">
             <h2 style="margin-bottom: 20px; text-align: center;">✨ What's New in 4.0.0</h2>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
@@ -1064,6 +1087,29 @@ fe3a61df|jbraswell|10187286+jbraswell@users.noreply.github.com|2024-07-20|consid
         document.getElementById('busiestMonth').textContent = `${busiestMonth[0]} (${busiestMonth[1]} commits)`;
         document.getElementById('avgWeekly').textContent = (weekData.reduce((a, b) => a + b, 0) / weekData.length).toFixed(1);
         document.getElementById('coffeeCount').textContent = (totalCommits / daysDiff).toFixed(1);
+
+        // Calculate estimated development time
+        // Industry estimates:
+        // - Small commit: 1-2 hours (bug fixes, small changes)
+        // - Medium commit: 2-4 hours (features, refactoring)
+        // - Large commit: 4-8 hours (major features, architecture)
+        // Average: ~2.5 hours per commit (conservative estimate)
+        
+        const hoursPerCommit = 2.5;
+        const totalHours = totalCommits * hoursPerCommit;
+        const totalMinutes = totalHours * 60;
+        const workWeeks = (totalHours / 40).toFixed(1);
+        const linesPerHour = Math.round(56432 / totalHours);
+        
+        const totalHoursEl = document.getElementById('totalHours');
+        const avgTimePerCommitEl = document.getElementById('avgTimePerCommit');
+        const workWeeksEl = document.getElementById('workWeeks');
+        const linesPerHourEl = document.getElementById('linesPerHour');
+        
+        if (totalHoursEl) totalHoursEl.textContent = `${Math.round(totalHours).toLocaleString()} hours`;
+        if (avgTimePerCommitEl) avgTimePerCommitEl.textContent = `${hoursPerCommit} hrs`;
+        if (workWeeksEl) workWeeksEl.textContent = workWeeks;
+        if (linesPerHourEl) linesPerHourEl.textContent = linesPerHour;
 
         // Generate heatmap
         const heatmapContainer = document.getElementById('heatmap');
