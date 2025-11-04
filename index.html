@@ -200,6 +200,8 @@
             border-radius: 4px;
             color: white;
             font-weight: bold;
+            display: inline-block;
+            white-space: nowrap;
         }
         .interactive-card {
             background: white;
@@ -207,6 +209,11 @@
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             transition: all 0.3s;
+        }
+        @media (max-width: 768px) {
+            .interactive-card {
+                padding: 15px;
+            }
         }
         .interactive-card:hover {
             transform: translateY(-4px);
@@ -458,18 +465,36 @@
 
         <div style="background: #f8f9fa; padding: 30px; border-radius: 12px; margin-bottom: 40px;">
             <h2 style="color: #667eea; margin-bottom: 20px; text-align: center;">📈 Development Velocity</h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
                 <div class="interactive-card">
-                    <h3 style="color: #667eea; margin-bottom: 15px;">🏃 Sprint Intensity</h3>
-                    <div style="color: #666; margin-bottom: 10px;">Peak day: <span class="stat-highlight">Tuesday (53 commits)</span></div>
-                    <div style="color: #666; margin-bottom: 10px;">Most productive time: <span class="stat-highlight">Afternoon (103 commits)</span></div>
-                    <div style="color: #666;">Weekend warrior commits: <span class="stat-highlight">78 commits</span></div>
+                    <h3 style="color: #667eea; margin-bottom: 15px; font-size: 1.1em;">🏃 Sprint Intensity</h3>
+                    <div style="color: #666; margin-bottom: 12px; line-height: 1.8;">
+                        <div style="margin-bottom: 8px;"><strong>Peak day:</strong></div>
+                        <div><span class="stat-highlight">Tuesday (53 commits)</span></div>
+                    </div>
+                    <div style="color: #666; margin-bottom: 12px; line-height: 1.8;">
+                        <div style="margin-bottom: 8px;"><strong>Most productive:</strong></div>
+                        <div><span class="stat-highlight">Afternoon (103 commits)</span></div>
+                    </div>
+                    <div style="color: #666; line-height: 1.8;">
+                        <div style="margin-bottom: 8px;"><strong>Weekend commits:</strong></div>
+                        <div><span class="stat-highlight">78 commits</span></div>
+                    </div>
                 </div>
                 <div class="interactive-card">
-                    <h3 style="color: #667eea; margin-bottom: 15px;">💪 Commit Streaks</h3>
-                    <div style="color: #666; margin-bottom: 10px;">Longest active month: <span class="stat-highlight" id="busiestMonth">-</span></div>
-                    <div style="color: #666; margin-bottom: 10px;">Average commits/week: <span class="stat-highlight" id="avgWeekly">-</span></div>
-                    <div style="color: #666;">Tech-focused commits: <span class="stat-highlight">30+ commits</span></div>
+                    <h3 style="color: #667eea; margin-bottom: 15px; font-size: 1.1em;">💪 Commit Streaks</h3>
+                    <div style="color: #666; margin-bottom: 12px; line-height: 1.8;">
+                        <div style="margin-bottom: 8px;"><strong>Busiest month:</strong></div>
+                        <div><span class="stat-highlight" id="busiestMonth">-</span></div>
+                    </div>
+                    <div style="color: #666; margin-bottom: 12px; line-height: 1.8;">
+                        <div style="margin-bottom: 8px;"><strong>Avg commits/week:</strong></div>
+                        <div><span class="stat-highlight" id="avgWeekly">-</span></div>
+                    </div>
+                    <div style="color: #666; line-height: 1.8;">
+                        <div style="margin-bottom: 8px;"><strong>Tech-focused:</strong></div>
+                        <div><span class="stat-highlight">30+ commits</span></div>
+                    </div>
                 </div>
             </div>
         </div>
