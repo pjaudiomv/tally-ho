@@ -176,6 +176,75 @@
             font-size: 0.9em;
             transition: width 1s ease-out;
         }
+        .badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85em;
+            margin: 5px;
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .badge.gold { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #333; }
+        .badge.silver { background: linear-gradient(135deg, #C0C0C0 0%, #808080 100%); color: white; }
+        .badge.bronze { background: linear-gradient(135deg, #CD7F32 0%, #8B4513 100%); color: white; }
+        .badge.special { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .heatmap {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(12px, 1fr));
+            gap: 3px;
+            margin: 20px 0;
+        }
+        .heatmap-cell {
+            aspect-ratio: 1;
+            border-radius: 2px;
+            background: #eee;
+            transition: all 0.3s;
+        }
+        .heatmap-cell:hover {
+            transform: scale(1.5);
+            z-index: 10;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .heatmap-cell.level-0 { background: #ebedf0; }
+        .heatmap-cell.level-1 { background: #c6e48b; }
+        .heatmap-cell.level-2 { background: #7bc96f; }
+        .heatmap-cell.level-3 { background: #239a3b; }
+        .heatmap-cell.level-4 { background: #196127; }
+        .download-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+            margin: 10px;
+        }
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        .fun-fact {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 20px;
+            border-radius: 12px;
+            color: white;
+            text-align: center;
+            font-size: 1.2em;
+            margin: 20px 0;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
     </style>
 </head>
 <body>
@@ -325,6 +394,40 @@
             </div>
         </div>
 
+        <div style="background: #f8f9fa; padding: 30px; border-radius: 12px; margin-bottom: 40px;">
+            <h2 style="color: #667eea; margin-bottom: 20px; text-align: center;">🏆 Achievement Badges Unlocked!</h2>
+            <div style="text-align: center;">
+                <span class="badge gold">🚀 100+ Commits</span>
+                <span class="badge gold">📅 16 Month Sprint</span>
+                <span class="badge silver">⚡ 56K+ Lines Added</span>
+                <span class="badge silver">🔧 251 Issues Closed</span>
+                <span class="badge bronze">🌍 11 Languages</span>
+                <span class="badge bronze">🧪 26 Test Commits</span>
+                <span class="badge special">💎 New UI Architect</span>
+                <span class="badge special">🎨 Svelte 5 Pioneer</span>
+            </div>
+        </div>
+
+        <div style="background: #f8f9fa; padding: 30px; border-radius: 12px; margin-bottom: 40px;">
+            <h2 style="color: #667eea; margin-bottom: 10px; text-align: center;">🔥 Commit Activity Heatmap</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 20px;">Every square represents a day of development</p>
+            <div id="heatmap" class="heatmap"></div>
+            <div style="text-align: center; margin-top: 15px;">
+                <span style="color: #666; font-size: 0.9em; margin-right: 15px;">Less</span>
+                <span class="heatmap-cell level-0" style="display: inline-block; width: 12px; height: 12px; margin: 0 3px;"></span>
+                <span class="heatmap-cell level-1" style="display: inline-block; width: 12px; height: 12px; margin: 0 3px;"></span>
+                <span class="heatmap-cell level-2" style="display: inline-block; width: 12px; height: 12px; margin: 0 3px;"></span>
+                <span class="heatmap-cell level-3" style="display: inline-block; width: 12px; height: 12px; margin: 0 3px;"></span>
+                <span class="heatmap-cell level-4" style="display: inline-block; width: 12px; height: 12px; margin: 0 3px;"></span>
+                <span style="color: #666; font-size: 0.9em; margin-left: 15px;">More</span>
+            </div>
+        </div>
+
+        <div class="fun-fact">
+            💡 <strong>Fun Fact:</strong> The team averaged <span id="coffeeCount">-</span> commits per day! ☕
+            That's dedication! 🎉
+        </div>
+
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 12px; color: white; margin-bottom: 40px;">
             <h2 style="margin-bottom: 20px; text-align: center;">✨ What's New in 4.0.0</h2>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
@@ -353,6 +456,13 @@
                     <p style="opacity: 0.9; line-height: 1.6;">WCAG compliant with improved keyboard navigation and screen reader support.</p>
                 </div>
             </div>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h2 style="color: #667eea; margin-bottom: 20px;">📥 Export Data</h2>
+            <button class="download-btn" onclick="downloadCSV()">📊 Download CSV Report</button>
+            <button class="download-btn" onclick="downloadJSON()">💾 Download JSON Data</button>
+            <button class="download-btn" onclick="window.print()">🖨️ Print Summary</button>
         </div>
 
         <div class="top-contributors">
@@ -848,6 +958,36 @@ fe3a61df|jbraswell|10187286+jbraswell@users.noreply.github.com|2024-07-20|consid
         const busiestMonth = Object.entries(monthlyCommits).sort((a, b) => b[1] - a[1])[0];
         document.getElementById('busiestMonth').textContent = `${busiestMonth[0]} (${busiestMonth[1]} commits)`;
         document.getElementById('avgWeekly').textContent = (weekData.reduce((a, b) => a + b, 0) / weekData.length).toFixed(1);
+        document.getElementById('coffeeCount').textContent = (totalCommits / daysDiff).toFixed(1);
+
+        // Generate heatmap
+        const heatmapContainer = document.getElementById('heatmap');
+        const commitsByDate = {};
+        commits.forEach(commit => {
+            const date = commit.date;
+            commitsByDate[date] = (commitsByDate[date] || 0) + 1;
+        });
+
+        // Generate all days from start to end
+        const startDate = new Date('2024-07-05');
+        const endDate = new Date('2025-11-03');
+        const allDays = [];
+        
+        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+            const dateStr = d.toISOString().split('T')[0];
+            const count = commitsByDate[dateStr] || 0;
+            
+            let level = 0;
+            if (count > 0) level = 1;
+            if (count >= 2) level = 2;
+            if (count >= 4) level = 3;
+            if (count >= 6) level = 4;
+            
+            const cell = document.createElement('div');
+            cell.className = `heatmap-cell level-${level}`;
+            cell.title = `${dateStr}: ${count} commit${count !== 1 ? 's' : ''}`;
+            heatmapContainer.appendChild(cell);
+        }
 
         // Store all commits globally for filtering
         window.allCommits = commits;
@@ -914,6 +1054,58 @@ fe3a61df|jbraswell|10187286+jbraswell@users.noreply.github.com|2024-07-20|consid
             renderCommits(filtered.slice(0, 100));
         }
         window.searchCommits = searchCommits;
+
+        // Download functions
+        function downloadCSV() {
+            let csv = 'Hash,Author,Date,Message\n';
+            commits.forEach(commit => {
+                csv += `"${commit.hash}","${commit.author}","${commit.date}","${commit.message.replace(/"/g, '""')}"\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'bmlt-4.0.0-commits.csv';
+            a.click();
+        }
+        window.downloadCSV = downloadCSV;
+
+        function downloadJSON() {
+            const data = {
+                version: '4.0.0',
+                period: 'July 5, 2024 - November 3, 2025',
+                stats: {
+                    totalCommits: totalCommits,
+                    contributors: contributors.length,
+                    daysActive: daysDiff,
+                    avgCommitsPerDay: avgCommitsPerDay,
+                    linesAdded: 56432,
+                    linesDeleted: 47249,
+                    netChange: 9183,
+                    filesChanged: 1148,
+                    issuesClosed: 251,
+                    newFeatures: 70,
+                    bugFixes: 50
+                },
+                commits: commits,
+                contributorStats: Object.entries(contributorCounts).map(([author, count]) => ({
+                    author,
+                    commits: count,
+                    percentage: ((count / totalCommits) * 100).toFixed(1),
+                    firstCommit: contributorFirstLast[author].first,
+                    lastCommit: contributorFirstLast[author].last
+                }))
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'bmlt-4.0.0-report.json';
+            a.click();
+        }
+        window.downloadJSON = downloadJSON;
     </script>
 </body>
 </html>
