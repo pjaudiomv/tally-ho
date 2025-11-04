@@ -111,6 +111,71 @@
         canvas {
             max-height: 400px;
         }
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .filter-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        .stat-highlight {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+        }
+        .interactive-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        .interactive-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        .progress-bar {
+            height: 24px;
+            background: #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+            transition: width 1s ease-out;
+        }
     </style>
 </head>
 <body>
@@ -231,6 +296,35 @@
             <canvas id="monthlyChart"></canvas>
         </div>
 
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 30px; margin-bottom: 40px;">
+            <div class="chart-container">
+                <div class="chart-title">📅 Commits by Day of Week</div>
+                <canvas id="dayOfWeekChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <div class="chart-title">🕐 Commits by Time of Day</div>
+                <canvas id="timeOfDayChart"></canvas>
+            </div>
+        </div>
+
+        <div style="background: #f8f9fa; padding: 30px; border-radius: 12px; margin-bottom: 40px;">
+            <h2 style="color: #667eea; margin-bottom: 20px; text-align: center;">📈 Development Velocity</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <div class="interactive-card">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">🏃 Sprint Intensity</h3>
+                    <div style="color: #666; margin-bottom: 10px;">Peak day: <span class="stat-highlight">Tuesday (53 commits)</span></div>
+                    <div style="color: #666; margin-bottom: 10px;">Most productive time: <span class="stat-highlight">Afternoon (103 commits)</span></div>
+                    <div style="color: #666;">Weekend warrior commits: <span class="stat-highlight">78 commits</span></div>
+                </div>
+                <div class="interactive-card">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">💪 Commit Streaks</h3>
+                    <div style="color: #666; margin-bottom: 10px;">Longest active month: <span class="stat-highlight" id="busiestMonth">-</span></div>
+                    <div style="color: #666; margin-bottom: 10px;">Average commits/week: <span class="stat-highlight" id="avgWeekly">-</span></div>
+                    <div style="color: #666;">Tech-focused commits: <span class="stat-highlight">30+ commits</span></div>
+                </div>
+            </div>
+        </div>
+
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 12px; color: white; margin-bottom: 40px;">
             <h2 style="margin-bottom: 20px; text-align: center;">✨ What's New in 4.0.0</h2>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
@@ -262,7 +356,17 @@
         </div>
 
         <div class="top-contributors">
-            <h2 style="color: #667eea; margin-bottom: 20px;">📊 Contributor Statistics</h2>
+            <h2 style="color: #667eea; margin-bottom: 20px; text-align: center;">📊 Contributor Statistics</h2>
+            <div class="filter-buttons">
+                <button class="filter-btn active" onclick="filterCommits('all')">All Contributors</button>
+                <button class="filter-btn" onclick="filterCommits('pjaudiomv')">pjaudiomv</button>
+                <button class="filter-btn" onclick="filterCommits('Alan B')">Alan B</button>
+                <button class="filter-btn" onclick="filterCommits('jbraswell')">jbraswell</button>
+                <button class="filter-btn" onclick="filterCommits('dependabot[bot]')">dependabot</button>
+            </div>
+            <div style="text-align: center; margin-bottom: 20px; font-size: 1.1em; color: #667eea; font-weight: 600;">
+                Showing <span id="filteredCount">254</span> commits
+            </div>
             <table id="contributorTable">
                 <thead>
                     <tr>
@@ -278,7 +382,15 @@
         </div>
 
         <div style="margin-top: 40px;">
-            <h2 style="color: #667eea; margin-bottom: 20px;">📝 Recent Commits (Last 20)</h2>
+            <h2 style="color: #667eea; margin-bottom: 20px; text-align: center;">📝 Commit Browser</h2>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <input type="text" id="searchInput" placeholder="🔍 Search commits by message, author, or hash..." 
+                    style="width: 100%; max-width: 600px; padding: 12px 20px; border: 2px solid #667eea; border-radius: 8px; font-size: 1em;"
+                    oninput="searchCommits()">
+            </div>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <span style="color: #666; font-size: 0.95em;">Showing <span id="visibleCommits">20</span> of <span id="totalCommits">254</span> commits</span>
+            </div>
             <table id="commitsTable">
                 <thead>
                     <tr>
@@ -332,7 +444,7 @@ a89a5992|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-10-13|ensure
 e2783e50|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-09-01|error modal (#1286)
 ddb5b916|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-08-29|bump actions (#1284)
 65224a1f|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-08-29|highlight last selected not edited (#1283)
-e6a40dc1|Patrick Joyce|pjaudiomv@gmail.com|2025-08-26|copy published status
+e6a40dc1|pjaudiomv|pjaudiomv@gmail.com|2025-08-26|copy published status
 3294ae5d|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-08-26|copy meeting (#1282)
 fdf581ac|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-08-26|format grouping (#1281)
 a8b4461c|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-08-24|bump deps (#1276)
@@ -391,7 +503,7 @@ d43e510a|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-11|fix sp
 8329d438|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-11|hide format close button (#1209)
 bd1f5d6f|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-11|fix red color for login server error (#1208)
 d0487ea3|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-11|upgrade flowbite to 1.5.5
-8fea3ab3|Patrick Joyce|pjaudiomv@gmail.com|2025-06-01|fix ci build
+8fea3ab3|pjaudiomv|pjaudiomv@gmail.com|2025-06-01|fix ci build
 31b08419|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-01|rename root server to server (#1207)
 82b7b0d6|jbraswell|10187286+jbraswell@users.noreply.github.com|2025-05-17|add MergeFormats command (#1204)
 1d0790fb|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-05-15|update missed aggregator  DB statement for Laravel 10 compatibility (#1203)
@@ -403,11 +515,11 @@ ac2755bb|dependabot[bot]|49699333+dependabot[bot]@users.noreply.github.com|2025-
 0f94eb22|Alan B|918773+alanb2718@users.noreply.github.com|2025-05-02|update version in app.php (#1195)
 1c615f87|Alan B|918773+alanb2718@users.noreply.github.com|2025-05-02|update user agent (#1194)
 a080face|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-05-01|rm package lock, unsued config, mv prettier to different config (#1193)
-e9ada21c|Patrick Joyce|pjaudiomv@gmail.com|2025-04-27|Add ability to override php version for dev
-9e8c4e57|Patrick Joyce|pjaudiomv@gmail.com|2025-04-27|php versions
-52375f1a|Patrick Joyce|pjaudiomv@gmail.com|2025-04-27|add 8.2 tag
+e9ada21c|pjaudiomv|pjaudiomv@gmail.com|2025-04-27|Add ability to override php version for dev
+9e8c4e57|pjaudiomv|pjaudiomv@gmail.com|2025-04-27|php versions
+52375f1a|pjaudiomv|pjaudiomv@gmail.com|2025-04-27|add 8.2 tag
 d96723da|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-04-27|upgrade to laravel 12 (#1191)
-a59d23e2|Patrick Joyce|pjaudiomv@gmail.com|2025-04-26|fix build stage
+a59d23e2|pjaudiomv|pjaudiomv@gmail.com|2025-04-26|fix build stage
 200c4652|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-04-26|Upgrade to laravdel 11, Add support for PHP 8.4, drop 8.1 (#1190)
 4f99cf81|Alan B|918773+alanb2718@users.noreply.github.com|2025-04-26|migrate MeetingsList to svelte 5 (#1189)
 87b3f600|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-04-25|migrate to Svelte 5 (#1186)
@@ -419,7 +531,7 @@ c6b81955|dependabot[bot]|49699333+dependabot[bot]@users.noreply.github.com|2024-
 f810b9aa|Alan B|918773+alanb2718@users.noreply.github.com|2024-11-23|use 5 minute intervals for meeting duration choice; allow old-format default duration (#1157)
 17bcc938|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-11-20|svelte5 (#1154)
 41138eeb|Alan B|918773+alanb2718@users.noreply.github.com|2024-11-19|show meetings right away if there is only one service body (#1155)
-8cc2e281|Patrick Joyce|pjaudiomv@gmail.com|2024-11-19|rm package lock
+8cc2e281|pjaudiomv|pjaudiomv@gmail.com|2024-11-19|rm package lock
 f81c605a|dependabot[bot]|49699333+dependabot[bot]@users.noreply.github.com|2024-11-18|Bump phpoffice/phpspreadsheet from 1.29.2 to 1.29.4 in /src (#1153)
 1a3ff9c6|Alan B|918773+alanb2718@users.noreply.github.com|2024-11-16|change unit tests to take advantage of new BasicAccordion component (#1152)
 2fcbb81f|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-11-16|add tests for meeting form (#1151)
@@ -464,7 +576,7 @@ fb7b4d6d|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-15|Make c
 2110482a|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-15|Add meeting changes tab (#1084)
 739c6bd4|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-15|add meeting changes admin api endpoint (#1083)
 de7e05bd|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-08|add states setting to unstable task (#1082)
-6c500ed9|Patrick Joyce|pjaudiomv@gmail.com|2024-10-08|Add states setting
+6c500ed9|pjaudiomv|pjaudiomv@gmail.com|2024-10-08|Add states setting
 a5f8660c|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-07|Add support for config array settings using comma seperated strings (#1080)
 1647a027|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-07|use settings for states and counties dropdowns if set (#1081)
 5c550f62|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-07|set start time validation (#1079)
@@ -500,7 +612,7 @@ bee3f060|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-20|Pj/sb 
 0dea8003|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-18|add meeting search (#1045)
 96adf39e|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-17|add clear form button to account page (#1042)
 7f343d81|dependabot[bot]|49699333+dependabot[bot]@users.noreply.github.com|2024-09-17|Bump vite from 5.4.3 to 5.4.6 in /src (#1044)
-44f49ce6|Patrick Joyce|pjaudiomv@gmail.com|2024-09-17|bypass env check for build lint
+44f49ce6|pjaudiomv|pjaudiomv@gmail.com|2024-09-17|bypass env check for build lint
 48365d15|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-17|add meeting tabs component (#1041)
 01b4d16e|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-16|fix for confirming dirty changes with close button (#1039)
 a579b655|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-16|Pj/train lines fix (#1038)
@@ -512,7 +624,7 @@ ccf58c33|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-16|add ge
 a24dd6a0|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-10|add rest of front end settings (#1031)
 88c44713|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-08|Add initial mocks for formats and meetings, fixes Login test (#1029)
 1c7b2ae5|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-08-27|initial meetings page (#1019)
-03e81fdd|Patrick Joyce|pjaudiomv@gmail.com|2024-08-26|add codecov coverage
+03e81fdd|pjaudiomv|pjaudiomv@gmail.com|2024-08-26|add codecov coverage
 6f121ac6|Alan B|918773+alanb2718@users.noreply.github.com|2024-08-25|fix bug with multiple saves in Account form, use UserPartialUpdate instead of UserUpdate (#1020)
 40540e38|Alan B|918773+alanb2718@users.noreply.github.com|2024-08-18|fix bugs in Account form and shared data and mocks; update unit tests to use new shared data (#1016)
 f13ead19|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-08-18|rm content encoding so browser doesnt decode, update client api (#1014)
@@ -692,17 +804,116 @@ fe3a61df|jbraswell|10187286+jbraswell@users.noreply.github.com|2024-07-20|consid
                 `;
             });
 
-        // Recent commits table
-        const commitsTbody = document.querySelector('#commitsTable tbody');
-        commits.slice(0, 20).forEach(commit => {
-            const row = commitsTbody.insertRow();
-            row.innerHTML = `
-                <td><span class="commit-hash">${commit.hash}</span></td>
-                <td>${commit.author}</td>
-                <td>${commit.date}</td>
-                <td class="commit-message">${commit.message}</td>
-            `;
+        // Day of week chart
+        const dayOfWeekData = {'Sunday': 46, 'Monday': 43, 'Tuesday': 53, 'Wednesday': 27, 'Thursday': 30, 'Friday': 33, 'Saturday': 32};
+        const daysOrder = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        
+        new Chart(document.getElementById('dayOfWeekChart'), {
+            type: 'bar',
+            data: {
+                labels: daysOrder,
+                datasets: [{
+                    label: 'Commits',
+                    data: daysOrder.map(day => dayOfWeekData[day]),
+                    backgroundColor: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: { legend: { display: false } }
+            }
         });
+
+        // Time of day chart
+        new Chart(document.getElementById('timeOfDayChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Afternoon\n(12pm-6pm)', 'Evening\n(6pm-12am)', 'Morning\n(6am-12pm)', 'Night\n(12am-6am)'],
+                datasets: [{
+                    data: [103, 85, 71, 5],
+                    backgroundColor: ['#FFD93D', '#6BCF7F', '#4D96FF', '#8B5CF6']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+
+        // Calculate busiest month and avg weekly
+        const busiestMonth = Object.entries(monthlyCommits).sort((a, b) => b[1] - a[1])[0];
+        document.getElementById('busiestMonth').textContent = `${busiestMonth[0]} (${busiestMonth[1]} commits)`;
+        document.getElementById('avgWeekly').textContent = (weekData.reduce((a, b) => a + b, 0) / weekData.length).toFixed(1);
+
+        // Store all commits globally for filtering
+        window.allCommits = commits;
+        window.currentFilter = 'all';
+
+        // Recent commits table with all commits initially
+        function renderCommits(commitsToShow = commits.slice(0, 20)) {
+            const commitsTbody = document.querySelector('#commitsTable tbody');
+            commitsTbody.innerHTML = '';
+            commitsToShow.forEach(commit => {
+                const row = commitsTbody.insertRow();
+                row.innerHTML = `
+                    <td><span class="commit-hash">${commit.hash}</span></td>
+                    <td>${commit.author}</td>
+                    <td>${commit.date}</td>
+                    <td class="commit-message">${commit.message}</td>
+                `;
+            });
+            document.getElementById('visibleCommits').textContent = commitsToShow.length;
+            document.getElementById('totalCommits').textContent = commits.length;
+        }
+        renderCommits();
+
+        // Filter commits by contributor
+        function filterCommits(contributor) {
+            window.currentFilter = contributor;
+            
+            // Update button states
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            let filtered = contributor === 'all' ? commits : commits.filter(c => c.author === contributor);
+            
+            document.getElementById('filteredCount').textContent = filtered.length;
+            
+            // Apply search if there's a search term
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            if (searchTerm) {
+                filtered = filtered.filter(c => 
+                    c.message.toLowerCase().includes(searchTerm) ||
+                    c.author.toLowerCase().includes(searchTerm) ||
+                    c.hash.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            renderCommits(filtered.slice(0, 50));
+        }
+        window.filterCommits = filterCommits;
+
+        // Search commits
+        function searchCommits() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            let filtered = window.currentFilter === 'all' ? commits : commits.filter(c => c.author === window.currentFilter);
+            
+            if (searchTerm) {
+                filtered = filtered.filter(c => 
+                    c.message.toLowerCase().includes(searchTerm) ||
+                    c.author.toLowerCase().includes(searchTerm) ||
+                    c.hash.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            renderCommits(filtered.slice(0, 100));
+        }
+        window.searchCommits = searchCommits;
     </script>
 </body>
 </html>
