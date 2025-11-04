@@ -1,12 +1,708 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Advanced Table</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/app.ts"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMLT Server - Commit Overview (Jul 5, 2024 - Nov 3, 2025)</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 30px;
+        }
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        .chart-container {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .chart-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #eee;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .commit-hash {
+            font-family: monospace;
+            color: #667eea;
+            font-weight: bold;
+        }
+        .commit-message {
+            color: #555;
+        }
+        .top-contributors {
+            margin-top: 40px;
+        }
+        canvas {
+            max-height: 400px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 BMLT Server 4.0.0 Development Journey</h1>
+        <div class="subtitle">Complete UI Overhaul • July 5, 2024 - November 3, 2025</div>
+        <div style="text-align: center; font-size: 1.2em; color: #667eea; font-weight: 600; margin-bottom: 30px;">
+            487 Days of Innovation • Built with Svelte 5 & Modern Web Standards
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalCommits">0</div>
+                <div class="stat-label">Total Commits</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalContributors">0</div>
+                <div class="stat-label">Contributors</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="avgCommitsPerDay">0</div>
+                <div class="stat-label">Avg Commits/Day</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="daysActive">0</div>
+                <div class="stat-label">Days Span</div>
+            </div>
+        </div>
+
+        <div style="margin: 40px 0;">
+            <h2 style="color: #667eea; text-align: center; margin-bottom: 30px;">📈 Development Impact</h2>
+            <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+                <div class="stat-card" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                    <div class="stat-number">56.4K</div>
+                    <div class="stat-label">Lines Added</div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);">
+                    <div class="stat-number">47.2K</div>
+                    <div class="stat-label">Lines Deleted</div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <div class="stat-number">+9.2K</div>
+                    <div class="stat-label">Net Change</div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                    <div class="stat-number">1,148</div>
+                    <div class="stat-label">Files Changed</div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333;">
+                    <div class="stat-number">251</div>
+                    <div class="stat-label">Issues/PRs Closed</div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%); color: #333;">
+                    <div class="stat-number">70</div>
+                    <div class="stat-label">New Features</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 30px; border-radius: 12px; color: white; margin-bottom: 40px; text-align: center;">
+            <h2 style="margin-bottom: 15px; font-size: 1.8em;">🎯 Development Focus</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px;">
+                <div>
+                    <div style="font-size: 2.5em; font-weight: bold;">50</div>
+                    <div style="font-size: 1.1em; opacity: 0.95;">Bug Fixes</div>
+                </div>
+                <div>
+                    <div style="font-size: 2.5em; font-weight: bold;">26</div>
+                    <div style="font-size: 1.1em; opacity: 0.95;">Test Commits</div>
+                </div>
+                <div>
+                    <div style="font-size: 2.5em; font-weight: bold;">93×</div>
+                    <div style="font-size: 1.1em; opacity: 0.95;">Most Edited File</div>
+                    <div style="font-size: 0.9em; opacity: 0.8; margin-top: 5px;">MeetingEditForm.svelte</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="background: #f8f9fa; padding: 30px; border-radius: 12px; margin-bottom: 40px;">
+            <h2 style="color: #667eea; margin-bottom: 20px; text-align: center;">🎨 Technology Stack & Highlights</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; text-align: center;">
+                <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <div style="font-size: 2em; margin-bottom: 10px;">⚡</div>
+                    <div style="font-weight: bold; color: #667eea; margin-bottom: 5px;">Svelte 5</div>
+                    <div style="color: #666; font-size: 0.9em;">Modern reactive framework with TypeScript</div>
+                </div>
+                <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <div style="font-size: 2em; margin-bottom: 10px;">🎨</div>
+                    <div style="font-weight: bold; color: #667eea; margin-bottom: 5px;">Tailwind CSS 4</div>
+                    <div style="color: #666; font-size: 0.9em;">Flowbite Svelte components</div>
+                </div>
+                <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <div style="font-size: 2em; margin-bottom: 10px;">🚀</div>
+                    <div style="font-weight: bold; color: #667eea; margin-bottom: 5px;">Laravel 12</div>
+                    <div style="color: #666; font-size: 0.9em;">PHP 8.2+ backend with modern APIs</div>
+                </div>
+                <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <div style="font-size: 2em; margin-bottom: 10px;">🌍</div>
+                    <div style="font-weight: bold; color: #667eea; margin-bottom: 5px;">11 Languages</div>
+                    <div style="color: #666; font-size: 0.9em;">Full internationalization support</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-container">
+                <div class="chart-title">📅 Commits Over Time (Weekly)</div>
+                <canvas id="timelineChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <div class="chart-title">👥 Top Contributors</div>
+                <canvas id="contributorChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-container" style="margin-bottom: 40px;">
+            <div class="chart-title">📊 Monthly Commit Activity</div>
+            <canvas id="monthlyChart"></canvas>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 12px; color: white; margin-bottom: 40px;">
+            <h2 style="margin-bottom: 20px; text-align: center;">✨ What's New in 4.0.0</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 8px;">
+                    <h3 style="margin-bottom: 10px; font-size: 1.3em;">🎨 Complete UI Redesign</h3>
+                    <p style="opacity: 0.9; line-height: 1.6;">Modern, intuitive interface built with Svelte 5 for lightning-fast performance and exceptional user experience.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 8px;">
+                    <h3 style="margin-bottom: 10px; font-size: 1.3em;">🌐 Enhanced Internationalization</h3>
+                    <p style="opacity: 0.9; line-height: 1.6;">Support for 11 languages with improved translation management and locale-specific features.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 8px;">
+                    <h3 style="margin-bottom: 10px; font-size: 1.3em;">⚡ Performance Improvements</h3>
+                    <p style="opacity: 0.9; line-height: 1.6;">Upgraded to Laravel 12 and PHP 8.2+, delivering faster load times and improved scalability.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 8px;">
+                    <h3 style="margin-bottom: 10px; font-size: 1.3em;">🧪 Enhanced Testing</h3>
+                    <p style="opacity: 0.9; line-height: 1.6;">Comprehensive test suite with both backend and frontend coverage for rock-solid reliability.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 8px;">
+                    <h3 style="margin-bottom: 10px; font-size: 1.3em;">📱 Mobile Responsive</h3>
+                    <p style="opacity: 0.9; line-height: 1.6;">Fully responsive design optimized for tablets and smartphones with touch-friendly controls.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 8px;">
+                    <h3 style="margin-bottom: 10px; font-size: 1.3em;">♿ Accessibility First</h3>
+                    <p style="opacity: 0.9; line-height: 1.6;">WCAG compliant with improved keyboard navigation and screen reader support.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="top-contributors">
+            <h2 style="color: #667eea; margin-bottom: 20px;">📊 Contributor Statistics</h2>
+            <table id="contributorTable">
+                <thead>
+                    <tr>
+                        <th>Contributor</th>
+                        <th>Commits</th>
+                        <th>Percentage</th>
+                        <th>First Commit</th>
+                        <th>Last Commit</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div style="margin-top: 40px;">
+            <h2 style="color: #667eea; margin-bottom: 20px;">📝 Recent Commits (Last 20)</h2>
+            <table id="commitsTable">
+                <thead>
+                    <tr>
+                        <th>Hash</th>
+                        <th>Author</th>
+                        <th>Date</th>
+                        <th>Message</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Parse commit data
+        const commitData = `e5339581|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-11-03|fix ts recognition of global settings object (#1341)
+de991765|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-11-03|mv init map to onmount, not effect (#1340)
+d509e280|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-11-03|rm changes loading from effect (#1339)
+24922a22|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-11-02|fix issue with login title not being centered on mobile devices (#1338)
+16078078|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-11-02|Add spanish translations for new ui (#1337)
+435d0079|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-11-02|Add french translations (#1336)
+642b9224|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-11-01|bump flobite, resolve #1278 (#1335)
+2e8cab24|Alan B|918773+alanb2718@users.noreply.github.com|2025-11-01|better error handling for geocoding using gm_authFailure callback; localize error msgs (#1320)
+f4b80589|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-11-01|more lightmode fixes for basic accordian (#1334)
+e9ac4b41|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-11-01|Expand error modal by default (#1333)
+5df8ba2a|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-10-31|disable fields for auto geocoding (#1330)
+53f2c35e|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-10-30|Store user last login time in database instead of computing from tokens (#1327)
+1cbd1553|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-10-30|show last active at for user in ui (#1324)
+1e4fd820|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-10-30|Rename to last active at (#1323)
+01399e43|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-10-30|Add last access timestamp to User API resource (#1322)
+ba0b7b52|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-10-26|upgrade to al2023 ecs amis (#1319)
+4fc37398|jbraswell|10187286+jbraswell@users.noreply.github.com|2025-10-24|add logging for aggregator results (#1318)
+419d1328|dependabot[bot]|49699333+dependabot[bot]@users.noreply.github.com|2025-10-21|Bump vite from 7.1.9 to 7.1.11 in /src (#1316)
+25c23703|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-10-21|add docs for developing typescript client (#1317)
+1582fd98|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-10-19|add revision and date to docker builds (#1315)
+5c4fe4fd|jbraswell|10187286+jbraswell@users.noreply.github.com|2025-10-19|log aggregator server list and make invalid root server fatal (#1314)
+02422ba3|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-10-18|mv from legacy url list (#1307)
+bdffbd96|jbraswell|10187286+jbraswell@users.noreply.github.com|2025-10-18|change strlen to mb_strlen for SearchString (#1312)
+2f1f3141|jbraswell|10187286+jbraswell@users.noreply.github.com|2025-10-16|fix passing null value to strlen in GetSearchResults (#1310)
+8c280b42|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-10-14|bump svelte and fix pagination (#1305)
+de6da301|dependabot[bot]|49699333+dependabot[bot]@users.noreply.github.com|2025-10-13|Bump vite from 7.1.3 to 7.1.9 in /src (#1304)
+390678f8|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-10-13|upgrade @googlemaps/js-api-loader to v2 and centralize initialization (#1303)
+c0aba28e|jbraswell|10187286+jbraswell@users.noreply.github.com|2025-10-13|fix migrations check (#1302)
+a89a5992|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-10-13|ensure unqiue slugs (#1301)
+76564a62|Alan B|918773+alanb2718@users.noreply.github.com|2025-10-13|update install directions and eliminate need to copy initial starter database - now just done with migrations (#1300)
+60161ff1|Alan B|918773+alanb2718@users.noreply.github.com|2025-10-05|add check for missing autoconfig file (#1297)
+006a8b81|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-09-09|set coordinates to null for virtual meetings (venue_type=2) in TSML output (#1289)
+9e52bd2b|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-09-06|include service body name in meeting response for query api (#1288)
+6604c684|jbraswell|10187286+jbraswell@users.noreply.github.com|2025-09-02|error handling example (#1287)
+e2783e50|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-09-01|error modal (#1286)
+ddb5b916|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-08-29|bump actions (#1284)
+65224a1f|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-08-29|highlight last selected not edited (#1283)
+e6a40dc1|Patrick Joyce|pjaudiomv@gmail.com|2025-08-26|copy published status
+3294ae5d|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-08-26|copy meeting (#1282)
+fdf581ac|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-08-26|format grouping (#1281)
+a8b4461c|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-08-24|bump deps (#1276)
+99b5dd99|Alan B|918773+alanb2718@users.noreply.github.com|2025-08-24|change description of noTranslationAvailable to make it (er) easier to translate (#1274)
+91cc951b|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-08-23|add translations download button; flatten translations files so that they typecheck correctly (#1261)
+5ee6d22d|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-08-20|Add better error handling for tz geocoding issues (#1273)
+4586cc43|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-08-19|Update Persian translations (#1272)
+02ad941f|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-08-17|Css updates for bmlt notice (#1271)
+a804e8b4|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-08-17|update composer packages (#1268)
+ce64080e|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-08-17|update to vite 7 (#1270)
+ee905838|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-08-17|Add persian translations (#1269)
+df71239e|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-08-14|vendor timezone assets locally (#1266)
+41548a8c|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-08-14|swap out tz cdn (#1265)
+863ef267|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-08-11|add bmlt notice setting (#1264)
+76564c55|jbraswell|10187286+jbraswell@users.noreply.github.com|2025-08-10|add ability to exclude specific meetings (#1263)
+b4ecb635|Alan B|918773+alanb2718@users.noreply.github.com|2025-08-10|add mock for getMeetingChanges (#1262)
+545ee06b|Alan B|918773+alanb2718@users.noreply.github.com|2025-08-04|check that console.error is called correctly if laravel.log is missing (#1258)
+98185324|jbraswell|10187286+jbraswell@users.noreply.github.com|2025-08-03|remove bad sort on group by query in naws export (#1256)
+98bd164c|jbraswell|10187286+jbraswell@users.noreply.github.com|2025-08-03|timeZone should not be required when creating meetings (#1255)
+6faeea28|Alan B|918773+alanb2718@users.noreply.github.com|2025-08-02|add unit tests for Administration tab
+eb8a4b81|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-25|fix yup sb validation (#1248)
+61da95ff|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-24|swagger ignore (#1247)
+1fcba88c|jbraswell|10187286+jbraswell@users.noreply.github.com|2025-06-24|remove unused function from format repository (#1246)
+f21d8168|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-24|Update PHP badge for min 8.2 (#1245)
+844cf102|pjaudiomv|pjaudiomv@gmail.com|2025-06-24|update codecov
+098e08f5|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-24|fix method signature, deprecation notice (#1244)
+e2f1e53c|jbraswell|10187286+jbraswell@users.noreply.github.com|2025-06-23|fix admin_action=get_permissions, add admin_action=get_user_info (#1242)
+f7982d4d|jbraswell|10187286+jbraswell@users.noreply.github.com|2025-06-23|implement LegacyAuthController admin_action=get_permissions (#1241)
+b352590a|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-22|fix for disabed buttons (#1239)
+c27e719c|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-22|improve mobile buttons (#1238)
+9d12581c|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-21|unset google api key for unstable (#1237)
+52542686|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-21|use optgroups for tz dd (#1236)
+f9634179|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-20|fix loading of google maps (#1235)
+8a78e47c|Alan B|918773+alanb2718@users.noreply.github.com|2025-06-20|fix singular/plural labels (#1234)
+180b259b|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-19|rounded pagination dd, fix for meetings missing name and time (#1232)
+cf3e9f79|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-19|Pj/dd map style (#1231)
+4a3db887|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-19|only load changes once (#1230)
+b0868217|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-19|use handleErrors (#1229)
+11e080c2|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-19|Pj/naws ids skip validation (#1228)
+c62025ce|jbraswell|10187286+jbraswell@users.noreply.github.com|2025-06-19|add skipVenueTypeLocationValidation param to meeting partial update (#1227)
+fc73aeb9|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-18|Add laravel logs download (#1226)
+ed821621|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-18|Add rest of translations (#1225)
+d2ceb10c|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-18|proccess world ids (#1218)
+7961170b|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-17|bump server version (#1223)
+3e50afb2|jbraswell|10187286+jbraswell@users.noreply.github.com|2025-06-16|enable new ui by default (#1222)
+914c7455|jbraswell|10187286+jbraswell@users.noreply.github.com|2025-06-13|allow /meetings?meetingIds filter to accept invalid ids (#1220)
+2d755621|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-12|update annotation for swagger docs for partial meeting updates (#1219)
+0fb86729|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-12|format things (#1217)
+d6c13209|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-12|Highlight row of last selected object (#1216)
+3ee657b2|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-12|naws dump csv only (#1215)
+8053955a|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-12|Stop red dot from moving slightly (#1214)
+0cb50cab|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-11|Move user name to be first, same as service bodies (#1213)
+b5b3e65f|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-11|fix rest of select boxes to be rounded (#1212)
+5b0a942f|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-11|Dropdown and tree node fixes (#1211)
+d43e510a|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-11|fix spinner, rm modal (#1210)
+8329d438|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-11|hide format close button (#1209)
+bd1f5d6f|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-11|fix red color for login server error (#1208)
+d0487ea3|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-11|upgrade flowbite to 1.5.5
+8fea3ab3|Patrick Joyce|pjaudiomv@gmail.com|2025-06-01|fix ci build
+31b08419|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-06-01|rename root server to server (#1207)
+82b7b0d6|jbraswell|10187286+jbraswell@users.noreply.github.com|2025-05-17|add MergeFormats command (#1204)
+1d0790fb|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-05-15|update missed aggregator  DB statement for Laravel 10 compatibility (#1203)
+78b1f28b|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-05-13|change root server json ref (#1202)
+58580d9d|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-05-09|semantic controller (#1201)
+ac2755bb|dependabot[bot]|49699333+dependabot[bot]@users.noreply.github.com|2025-05-06|Bump league/commonmark from 2.6.2 to 2.7.0 in /src (#1199)
+478d5663|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-05-06|tsml format (#1198)
+19f09e57|Alan B|918773+alanb2718@users.noreply.github.com|2025-05-02|update README to list required PHP modules (#1196)
+0f94eb22|Alan B|918773+alanb2718@users.noreply.github.com|2025-05-02|update version in app.php (#1195)
+1c615f87|Alan B|918773+alanb2718@users.noreply.github.com|2025-05-02|update user agent (#1194)
+a080face|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-05-01|rm package lock, unsued config, mv prettier to different config (#1193)
+e9ada21c|Patrick Joyce|pjaudiomv@gmail.com|2025-04-27|Add ability to override php version for dev
+9e8c4e57|Patrick Joyce|pjaudiomv@gmail.com|2025-04-27|php versions
+52375f1a|Patrick Joyce|pjaudiomv@gmail.com|2025-04-27|add 8.2 tag
+d96723da|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-04-27|upgrade to laravel 12 (#1191)
+a59d23e2|Patrick Joyce|pjaudiomv@gmail.com|2025-04-26|fix build stage
+200c4652|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-04-26|Upgrade to laravdel 11, Add support for PHP 8.4, drop 8.1 (#1190)
+4f99cf81|Alan B|918773+alanb2718@users.noreply.github.com|2025-04-26|migrate MeetingsList to svelte 5 (#1189)
+87b3f600|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-04-25|migrate to Svelte 5 (#1186)
+1eba13ef|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2025-02-17|bump ui deps (#1164)
+5cd97a90|dependabot[bot]|49699333+dependabot[bot]@users.noreply.github.com|2025-01-30|Bump vite from 5.4.11 to 5.4.14 in /src (#1163)
+bb99867f|dependabot[bot]|49699333+dependabot[bot]@users.noreply.github.com|2025-01-06|Bump phpoffice/phpspreadsheet from 1.29.4 to 1.29.7 in /src (#1162)
+c6b81955|dependabot[bot]|49699333+dependabot[bot]@users.noreply.github.com|2024-12-26|Bump league/commonmark from 2.5.3 to 2.6.0 in /src (#1161)
+45f14d8d|Alan B|918773+alanb2718@users.noreply.github.com|2024-11-25|update installation instructions (#1159)
+f810b9aa|Alan B|918773+alanb2718@users.noreply.github.com|2024-11-23|use 5 minute intervals for meeting duration choice; allow old-format default duration (#1157)
+17bcc938|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-11-20|svelte5 (#1154)
+41138eeb|Alan B|918773+alanb2718@users.noreply.github.com|2024-11-19|show meetings right away if there is only one service body (#1155)
+8cc2e281|Patrick Joyce|pjaudiomv@gmail.com|2024-11-19|rm package lock
+f81c605a|dependabot[bot]|49699333+dependabot[bot]@users.noreply.github.com|2024-11-18|Bump phpoffice/phpspreadsheet from 1.29.2 to 1.29.4 in /src (#1153)
+1a3ff9c6|Alan B|918773+alanb2718@users.noreply.github.com|2024-11-16|change unit tests to take advantage of new BasicAccordion component (#1152)
+2fcbb81f|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-11-16|add tests for meeting form (#1151)
+6ccd542e|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-11-13|fix sb indicator (#1150)
+6914d0aa|dependabot[bot]|49699333+dependabot[bot]@users.noreply.github.com|2024-11-12|Bump laravel/framework from 10.48.22 to 10.48.23 in /src (#1149)
+ec825196|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-11-12|fix day/time wrap (#1148)
+282213ee|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-11-12|Accordion2 (#1147)
+90eee8bd|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-11-12|meeting modal scroll fix (#1146)
+1d359bb9|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-11-12|execute search on enter key press (#1145)
+50ba5309|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-11-12|add select/unselect all SBs button (#1143)
+f476999f|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-11-11|set meeting modal to static height of 95 (#1142)
+a6e9a2c6|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-11-11|Show servicebody dropdown by defautl as well as all filters (#1141)
+d5ae4905|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-11-11|dont wrap date/time (#1140)
+8d037a50|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-11-11|add meetings per page (#1136)
+b23ff940|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-11-10|dirty form fix (#1129)
+703914c7|jbraswell|10187286+jbraswell@users.noreply.github.com|2024-11-09|support custom fields on meetings (#1123)
+650a62b1|Alan B|918773+alanb2718@users.noreply.github.com|2024-11-09|fill in more German translations (#1124)
+9152c10e|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-11-08|ui version bump (#1121)
+a42237bf|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-11-08|composer update (#1120)
+1640a9db|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-11-05|add bmlt title setting (#1117)
+1755b5c3|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-11-05|support for lang selection option in docker (#1116)
+a458a299|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-11-05|respect default_duration_setting (#1115)
+0056a714|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-11-04|add a better location validation (#1114)
+e2efd516|Alan B|918773+alanb2718@users.noreply.github.com|2024-11-02|error message improvements; fix PHP date test (#1111)
+82af27d6|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-31|throw error if failure (#1110)
+5c14d2e8|Alan B|918773+alanb2718@users.noreply.github.com|2024-10-29|validate URLs and emails in meeting info; fix bug in contact field name (#1109)
+cef91d44|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-27|reset meetingIds if not searching by meeting (#1108)
+92d2f488|Alan B|918773+alanb2718@users.noreply.github.com|2024-10-27|fix intermittent error arising from undefined in format translations (#1107)
+e267e44e|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-27|Load changes on clicking changes tab, hide changes tab for new meetings (#1105)
+c303aeb4|Alan B|918773+alanb2718@users.noreply.github.com|2024-10-26|handle reserved formats properly; test trying to delete a format that is in use (#1103)
+6b469407|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-25|select all service bodies and days by default (same as old [current] UI) (#1101)
+5b38a9fb|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-23|Handle format validation error (#1099)
+7a237d80|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-23|handle format delete conflict (#1098)
+3e1843aa|jbraswell|10187286+jbraswell@users.noreply.github.com|2024-10-23|return 409 when deleting format that has meetings assigned (#1097)
+531a5533|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-21|sort by date then id (#1096)
+8fe768eb|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-21|change wording of meeting change type (#1090)
+f41f84fe|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-17|Fix for returning changes as array (#1089)
+813bc0ef|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-17|output details as array (#1088)
+21c4b610|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-16|adjust space between on smaller displays (#1087)
+3ce5a3d1|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-15|fix tab spacing on smaller devices (#1086)
+fb7b4d6d|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-15|Make changes tab mo betta (#1085)
+2110482a|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-15|Add meeting changes tab (#1084)
+739c6bd4|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-15|add meeting changes admin api endpoint (#1083)
+de7e05bd|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-08|add states setting to unstable task (#1082)
+6c500ed9|Patrick Joyce|pjaudiomv@gmail.com|2024-10-08|Add states setting
+a5f8660c|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-07|Add support for config array settings using comma seperated strings (#1080)
+1647a027|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-07|use settings for states and counties dropdowns if set (#1081)
+5c550f62|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-07|set start time validation (#1079)
+5399ed13|dependabot[bot]|49699333+dependabot[bot]@users.noreply.github.com|2024-10-07|Bump phpoffice/phpspreadsheet from 1.29.1 to 1.29.2 in /src (#1078)
+56302759|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-07|Hide footer if no meetings (#1077)
+ae8ef354|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-07|Allow day dropdown to work for both search and filter of existing results (#1076)
+e5e7c4c1|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-06|Add initial meetings test (#1075)
+cd51294f|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-06|silence log output for format tests and validation errors (#1074)
+9b175361|Alan B|918773+alanb2718@users.noreply.github.com|2024-10-06|fix comments about the svelte-hack (#1072)
+8a353c19|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-06|filter service bodies for editors (#1070)
+9f6abbcc|Alan B|918773+alanb2718@users.noreply.github.com|2024-10-06|add Formats tests (#1071)
+0a5c1ff6|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-04|leave parent checked if children are unchecked (#1068)
+10932ee2|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-04|api/v1/meetings should always return unpublished (#1067)
+44fc5616|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-04|add selection indicators (#1066)
+616e9abf|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-03|fix for leaflet map loading (#1064)
+6f5491f7|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-03|Add geocoding class (#1063)
+8339c9f5|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-02|light/dark mode css fixes (#1062)
+2642c455|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-02|Auto Geo TZ (#1061)
+fd028ba6|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-10-01|Sort service bodies, published by default (#1060)
+86bca45e|Alan B|918773+alanb2718@users.noreply.github.com|2024-09-30|simplify AccordionItem conditional open; fix bug with format name in Delete Format (#1059)
+1a1d634e|Alan B|918773+alanb2718@users.noreply.github.com|2024-09-30|add Formats code (#1058)
+3f22f9cf|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-27|duration comment (#1057)
+30b22db1|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-27|Fix camel case for google api key (#1056)
+3ba2ce57|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-27|fix saving of timezone for admin api, add validation (#1054)
+37c78c9e|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-27|fix duration validation (#1055)
+ce4415ed|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-24|Add timezone selection dropdown (#1053)
+f97513fa|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-21|cleanup css for checkboxes (#1051)
+8fa0779d|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-21|check if search term is meeting id (#1050)
+4c625770|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-21|track checkbox (#1049)
+c5356f46|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-20|use flowbite checkbox (#1048)
+bee3f060|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-20|Pj/sb tree (#1047)
+170220dd|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-19|Pj/use single search filter (#1046)
+0dea8003|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-18|add meeting search (#1045)
+96adf39e|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-17|add clear form button to account page (#1042)
+7f343d81|dependabot[bot]|49699333+dependabot[bot]@users.noreply.github.com|2024-09-17|Bump vite from 5.4.3 to 5.4.6 in /src (#1044)
+44f49ce6|Patrick Joyce|pjaudiomv@gmail.com|2024-09-17|bypass env check for build lint
+48365d15|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-17|add meeting tabs component (#1041)
+01b4d16e|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-16|fix for confirming dirty changes with close button (#1039)
+a579b655|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-16|Pj/train lines fix (#1038)
+746e28e8|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-16|Add duration selector component (#1037)
+2ddbf707|Alan B|918773+alanb2718@users.noreply.github.com|2024-09-16|fix German translation for daysOfWeek, add other German translations (#1035)
+ccf58c33|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-16|add geocoding (#1032)
+1b215a4c|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-15|fix scroll for modal (#1034)
+039b7022|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-13|Set proper node version for builds (#1033)
+a24dd6a0|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-10|add rest of front end settings (#1031)
+88c44713|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-09-08|Add initial mocks for formats and meetings, fixes Login test (#1029)
+1c7b2ae5|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-08-27|initial meetings page (#1019)
+03e81fdd|Patrick Joyce|pjaudiomv@gmail.com|2024-08-26|add codecov coverage
+6f121ac6|Alan B|918773+alanb2718@users.noreply.github.com|2024-08-25|fix bug with multiple saves in Account form, use UserPartialUpdate instead of UserUpdate (#1020)
+40540e38|Alan B|918773+alanb2718@users.noreply.github.com|2024-08-18|fix bugs in Account form and shared data and mocks; update unit tests to use new shared data (#1016)
+f13ead19|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-08-18|rm content encoding so browser doesnt decode, update client api (#1014)
+26cec63a|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-08-18|Add authenticated endpoint to download laravel log (#1013)
+44c0e5ee|Alan B|918773+alanb2718@users.noreply.github.com|2024-08-16|factor out Account service body list to enable unit testing; misc unit test cleanup (#1012)
+3fe77ece|Alan B|918773+alanb2718@users.noreply.github.com|2024-08-14|revise Account tab, add unit tests (tests mostly done) (#1011)
+8dce3bde|Alan B|918773+alanb2718@users.noreply.github.com|2024-08-13|Ab/accordion (#1010)
+a4eb6ec9|Alan B|918773+alanb2718@users.noreply.github.com|2024-08-12|fill in Account tab (#1009)
+82168941|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-08-11|aggregator import fix (#1008)
+ec20e6f5|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-08-11|Add county and zip auto_geocoding_enabled settings to GetServerInfo (#1007)
+dcbaf98b|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-08-09|Add darkmode to swagger (#1005)
+9921ffb6|jbraswell|10187286+jbraswell@users.noreply.github.com|2024-08-04|add AGGREGATOR_DEFAULT_GEO_WIDTH_KM env var (#1004)
+aaf9bf97|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-08-03|Add additional tests for service bodies (#1003)
+5f02913e|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-08-03|fix and move service body modal test (#1002)
+44b9a98a|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-08-02|add user type route guards and tests #996 (#997)
+8b2b2471|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-08-02|Add ServiceBody mock data and functions (#989)
+e126e09e|Alan B|918773+alanb2718@users.noreply.github.com|2024-08-01|add stubs for Formats and Accounts pages; fix navbar test (#987)
+0cdd6556|Alan B|918773+alanb2718@users.noreply.github.com|2024-07-31|convert find to get when possible in testing library queries (#986)
+eb9025cc|Alan B|918773+alanb2718@users.noreply.github.com|2024-07-31|refactor tests - put navbar tests in a new test in Login tests; other cleanup (#985)
+f619ea42|Alan B|918773+alanb2718@users.noreply.github.com|2024-07-30|add tests of deleting a user (#984)
+356ba1db|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-07-30|cancel without saving modal (#983)
+f7d2625a|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-07-29|add service body form tests (#982)
+875ff5ca|Alan B|918773+alanb2718@users.noreply.github.com|2024-07-28|add tests that same keys exist for all languages and are sorted (#981)
+e1daeec1|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-07-28|Added TypeScript declaration, Modified  to return optional language or all languages (#979)
+4e0a9a05|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-07-27|add translations export method (#978)
+68202576|Alan B|918773+alanb2718@users.noreply.github.com|2024-07-27|add more unit tests for language selector, Users tab (#977)
+e9f5c044|Alan B|918773+alanb2718@users.noreply.github.com|2024-07-26|add unit tests for editing, adding, and deleting users (#976)
+8e4af284|Alan B|918773+alanb2718@users.noreply.github.com|2024-07-24|clean up how authentication is mocked; other minor unit test cleanup (#975)
+48131267|jbraswell|10187286+jbraswell@users.noreply.github.com|2024-07-24|allow observers to bet set as editors (#974)
+166f5a4b|jbraswell|10187286+jbraswell@users.noreply.github.com|2024-07-23|several service body enhancements and fixes (#973)
+78c8011a|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-07-23|differentiate user types (#968)
+2e55bef9|jbraswell|10187286+jbraswell@users.noreply.github.com|2024-07-23|return 409 when deleted user has children (#972)
+84245d31|jbraswell|10187286+jbraswell@users.noreply.github.com|2024-07-23|reset form isDirty if fields are reverted to initial values (#971)
+dcb8b0c2|jbraswell|10187286+jbraswell@users.noreply.github.com|2024-07-23|fix how initial values are set, set dirty on multiselect change (#970)
+4ba47160|jbraswell|10187286+jbraswell@users.noreply.github.com|2024-07-23|disable buttons until form is modified (#969)
+287ecdbe|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-07-22|Service Bodies Page (#964)
+c73ec0b9|jbraswell|10187286+jbraswell@users.noreply.github.com|2024-07-20|show error when deleting user assigned to service body (#967)
+fe3a61df|jbraswell|10187286+jbraswell@users.noreply.github.com|2024-07-20|consider assigned service bodies when deleting a user (#966)
+2562bf15|jbraswell|10187286+jbraswell@users.noreply.github.com|2024-07-20|always persist -1 when setting ownerId to a server admin (#965)
+8c9ebc1d|pjaudiomv|34245618+pjaudiomv@users.noreply.github.com|2024-07-14|implement new ui users section using svelte (#945)`;
+
+        // Parse commits
+        const commits = commitData.trim().split('\n').map(line => {
+            const [hash, author, email, date, message] = line.split('|');
+            return { hash, author, email, date, message };
+        });
+
+        // Calculate stats
+        const totalCommits = commits.length;
+        const contributors = [...new Set(commits.map(c => c.author))];
+        const contributorCounts = {};
+        const contributorFirstLast = {};
+        
+        commits.forEach(commit => {
+            contributorCounts[commit.author] = (contributorCounts[commit.author] || 0) + 1;
+            if (!contributorFirstLast[commit.author]) {
+                contributorFirstLast[commit.author] = { first: commit.date, last: commit.date };
+            } else {
+                contributorFirstLast[commit.author].last = commit.date;
+            }
+        });
+
+        const dates = commits.map(c => new Date(c.date));
+        const minDate = new Date(Math.min(...dates));
+        const maxDate = new Date(Math.max(...dates));
+        const daysDiff = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24));
+        const avgCommitsPerDay = (totalCommits / daysDiff).toFixed(2);
+
+        // Update stats
+        document.getElementById('totalCommits').textContent = totalCommits;
+        document.getElementById('totalContributors').textContent = contributors.length;
+        document.getElementById('avgCommitsPerDay').textContent = avgCommitsPerDay;
+        document.getElementById('daysActive').textContent = daysDiff;
+
+        // Commits over time (by week)
+        const weeklyCommits = {};
+        commits.forEach(commit => {
+            const date = new Date(commit.date);
+            const weekStart = new Date(date);
+            weekStart.setDate(date.getDate() - date.getDay());
+            const weekKey = weekStart.toISOString().split('T')[0];
+            weeklyCommits[weekKey] = (weeklyCommits[weekKey] || 0) + 1;
+        });
+
+        const weekLabels = Object.keys(weeklyCommits).sort();
+        const weekData = weekLabels.map(week => weeklyCommits[week]);
+
+        new Chart(document.getElementById('timelineChart'), {
+            type: 'line',
+            data: {
+                labels: weekLabels,
+                datasets: [{
+                    label: 'Commits per Week',
+                    data: weekData,
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+
+        // Top contributors chart
+        const sortedContributors = Object.entries(contributorCounts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 10);
+
+        new Chart(document.getElementById('contributorChart'), {
+            type: 'bar',
+            data: {
+                labels: sortedContributors.map(c => c[0]),
+                datasets: [{
+                    label: 'Commits',
+                    data: sortedContributors.map(c => c[1]),
+                    backgroundColor: '#667eea'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                indexAxis: 'y',
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+
+        // Monthly commits
+        const monthlyCommits = {};
+        commits.forEach(commit => {
+            const month = commit.date.substring(0, 7);
+            monthlyCommits[month] = (monthlyCommits[month] || 0) + 1;
+        });
+
+        const monthLabels = Object.keys(monthlyCommits).sort();
+        const monthData = monthLabels.map(month => monthlyCommits[month]);
+
+        new Chart(document.getElementById('monthlyChart'), {
+            type: 'bar',
+            data: {
+                labels: monthLabels,
+                datasets: [{
+                    label: 'Commits per Month',
+                    data: monthData,
+                    backgroundColor: '#764ba2'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+
+        // Contributor table
+        const tbody = document.querySelector('#contributorTable tbody');
+        Object.entries(contributorCounts)
+            .sort((a, b) => b[1] - a[1])
+            .forEach(([author, count]) => {
+                const percentage = ((count / totalCommits) * 100).toFixed(1);
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td><strong>${author}</strong></td>
+                    <td>${count}</td>
+                    <td>${percentage}%</td>
+                    <td>${contributorFirstLast[author].first}</td>
+                    <td>${contributorFirstLast[author].last}</td>
+                `;
+            });
+
+        // Recent commits table
+        const commitsTbody = document.querySelector('#commitsTable tbody');
+        commits.slice(0, 20).forEach(commit => {
+            const row = commitsTbody.insertRow();
+            row.innerHTML = `
+                <td><span class="commit-hash">${commit.hash}</span></td>
+                <td>${commit.author}</td>
+                <td>${commit.date}</td>
+                <td class="commit-message">${commit.message}</td>
+            `;
+        });
+    </script>
+</body>
 </html>
